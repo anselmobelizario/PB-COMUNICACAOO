@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { MapPin, Navigation, ArrowUpRight } from 'lucide-react';
 import { useReveal } from '../../hooks/useReveal';
 import { siteData } from '../../data/siteData';
@@ -17,10 +17,37 @@ function resolveMapUrl(location) {
 
 export default function LocationMapSection() {
   const revealRef = useReveal();
+  const frameRef = useRef(null);
+  // The embed pulls ~1.6 MB of Google script on every page load, so the src
+  // only goes in when the section closes in on the viewport (or never, for
+  // crawlers — the address and the maps links carry that job).
+  const [shouldLoadMap, setShouldLoadMap] = useState(false);
   const [mapFailed, setMapFailed] = useState(false);
   const { contact, company } = siteData;
   const { location } = contact;
   const mapUrl = resolveMapUrl(location);
+
+  useEffect(() => {
+    const frame = frameRef.current;
+    if (!frame) return undefined;
+    if (typeof IntersectionObserver === 'undefined') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-2019 browsers get the map right away
+      setShouldLoadMap(true);
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setShouldLoadMap(true);
+        observer.disconnect();
+      },
+      { rootMargin: '600px 0px' },
+    );
+
+    observer.observe(frame);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <section
@@ -83,8 +110,8 @@ export default function LocationMapSection() {
             </div>
           </div>
 
-          <div className="map-frame-light overflow-hidden rounded-[1.75rem]">
-            {mapFailed ? (
+          <div ref={frameRef} className="map-frame-light overflow-hidden rounded-[1.75rem]">
+            {mapFailed || !shouldLoadMap ? (
               <MapFallback
                 address={contact.address}
                 googleMapsUrl={location.googleMapsUrl}

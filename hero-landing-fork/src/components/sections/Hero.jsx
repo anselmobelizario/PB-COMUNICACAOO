@@ -295,7 +295,9 @@ export default function Hero() {
                 disablePictureInPicture
                 disableRemotePlayback
                 preload="none"
-                poster={assetUrl(video.poster)}
+                // No poster attr: the twin <img> behind it shows the same
+                // frame, and a video poster only turns into a (late) LCP
+                // candidate the moment the faded-out video becomes ready.
                 width={1920}
                 height={1080}
                 tabIndex={-1}

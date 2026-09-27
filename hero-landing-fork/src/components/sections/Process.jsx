@@ -1,11 +1,11 @@
 import { useReveal } from '../../hooks/useReveal';
 import StepIcon from '../icons/StepIcon';
-import { siteData } from '../../data/siteData';
+import { siteData, assetUrl } from '../../data/siteData';
 
 export default function Process() {
   const revealRef = useReveal();
   const { process } = siteData;
-  const { logoSrc, logoWidth, logoHeight } = siteData.company;
+  const { logoWidth, logoHeight } = siteData.company;
 
   return (
     <section
@@ -30,7 +30,7 @@ export default function Process() {
 
             <div className="process-brand-card mt-10" aria-label="A marca P&B Comunicação Visual">
               <img
-                src={logoSrc}
+                src={assetUrl('/assets/logo-360.webp')}
                 alt="P&B Comunicação Visual"
                 width={logoWidth}
                 height={logoHeight}

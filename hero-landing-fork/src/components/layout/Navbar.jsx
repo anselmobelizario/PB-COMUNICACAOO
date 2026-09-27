@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Menu, Phone, X } from 'lucide-react';
-import { siteData } from '../../data/siteData';
+import { siteData, assetUrl } from '../../data/siteData';
 import { useScrollLock } from '../../hooks/useScrollLock';
 import WhatsAppIcon from '../ui/WhatsAppIcon';
 
@@ -135,10 +135,10 @@ export default function Navbar() {
             />
             <div className="flex items-center justify-between border-b border-black/[0.06] px-6 py-4">
               <img
-                src={siteData.company.logoSrc}
+                src={assetUrl('/assets/logo-240.webp')}
                 alt={siteData.company.name}
-                width={siteData.company.logoWidth}
-                height={siteData.company.logoHeight}
+                width={240}
+                height={173}
                 className="h-12 w-auto"
               />
               <button
