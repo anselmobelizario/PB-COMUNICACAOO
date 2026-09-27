@@ -8,7 +8,7 @@
           "value": "pb-comunicacao.vercel.app"
         }
       ],
-      "destination": "https://pbcomunicacao.com.br$1",
+      "destination": "https://pbcomunicacao.com.br/$1",
       "permanent": true
     },
     {
