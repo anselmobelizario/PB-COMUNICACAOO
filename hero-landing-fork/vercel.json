@@ -1,6 +1,12 @@
 {
   "redirects": [
     {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "pb-comunicacao.vercel.app" }],
+      "destination": "https://pbcomunicacao.com.br$1",
+      "permanent": true
+    },
+    {
       "source": "/importancia-da-comunicacao-visual",
       "destination": "/#sobre",
       "permanent": true
