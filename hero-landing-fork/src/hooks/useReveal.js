@@ -23,15 +23,8 @@ export function useReveal() {
       });
     };
 
-    const rect = el.getBoundingClientRect();
-    const inView = rect.top < window.innerHeight && rect.bottom > 0;
-    if (inView) {
-      reveal();
-      return () => {
-        if (frameId !== null) window.cancelAnimationFrame(frameId);
-      };
-    }
-
+    // No getBoundingClientRect here: the observer delivers the current
+    // intersection right after observe(), without a forced layout.
     if (!('IntersectionObserver' in window)) {
       reveal();
       return () => {

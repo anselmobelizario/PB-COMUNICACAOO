@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Car, Flag, PaintRoller, Store } from 'lucide-react';
 import { useReveal } from '../../hooks/useReveal';
-import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
+import { getPrefersReducedMotion, usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import { gallerySrcSet, galleryUrl, siteData } from '../../data/siteData';
 
 const SERVICE_IMAGE_SIZES = '(min-width: 768px) 38rem, 92vw';
@@ -71,19 +71,35 @@ function resolveServiceGallery(service) {
 function ServiceCard({ service, index, ctaText }) {
   const revealRef = useReveal();
   const [slide, setSlide] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+  const [isEngaged, setIsEngaged] = useState(false);
   const isReducedMotion = usePrefersReducedMotion();
   const num = String(index + 1).padStart(2, '0');
   const gallery = resolveServiceGallery(service);
 
   useEffect(() => {
-    if (isReducedMotion || gallery.length < 2) return undefined;
+    const card = revealRef.current;
+    if (!card || typeof IntersectionObserver === 'undefined') return undefined;
+
+    // Offscreen intervals used to run forever, four cards at a time.
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0.25 },
+    );
+    observer.observe(card);
+    return () => observer.disconnect();
+  }, [revealRef]);
+
+  useEffect(() => {
+    // Paused while hovered or focused too — WCAG 2.2.2.
+    if (isReducedMotion || isEngaged || !isVisible || gallery.length < 2) return undefined;
 
     const interval = window.setInterval(() => {
       setSlide((current) => (current + 1) % gallery.length);
     }, 4200);
 
     return () => window.clearInterval(interval);
-  }, [gallery.length, isReducedMotion]);
+  }, [gallery.length, isEngaged, isReducedMotion, isVisible]);
 
   const goToPortfolio = (event) => {
     event.preventDefault();
@@ -106,6 +122,10 @@ function ServiceCard({ service, index, ctaText }) {
       <a
         href="#portfolio"
         onClick={goToPortfolio}
+        onMouseEnter={() => setIsEngaged(true)}
+        onMouseLeave={() => setIsEngaged(false)}
+        onFocus={() => setIsEngaged(true)}
+        onBlur={() => setIsEngaged(false)}
         className="service-card group relative flex flex-col overflow-hidden rounded-2xl transition-all duration-500 md:flex-row"
         aria-label={`Ver portfólio: ${service.title}`}
       >
@@ -200,7 +220,10 @@ export default function Services() {
 
   const handleTabClick = (index) => {
     setActiveTab(index);
-    document.getElementById(`service-card-${index}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.getElementById(`service-card-${index}`)?.scrollIntoView({
+      behavior: getPrefersReducedMotion() ? 'auto' : 'smooth',
+      block: 'center',
+    });
   };
 
   return (
