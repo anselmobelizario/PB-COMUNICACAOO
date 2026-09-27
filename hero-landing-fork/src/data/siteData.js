@@ -1,5 +1,6 @@
 import { buildWhatsAppLink } from '../utils/whatsapp';
 import galleryImageRatios from './galleryImageRatios.json';
+import assetVersions from './assetVersions.json';
 
 const WHATSAPP_PHONE = '5511965698725';
 
@@ -17,6 +18,20 @@ const FALLBACK_RATIO = 4 / 3;
 const withVersion = (url, version) => (version ? `${url}?v=${version}` : url);
 
 export const galleryUrl = (path) => withVersion(path, galleryImageRatios[path]?.v);
+
+// Same idea as galleryUrl for the stable-named assets outside the gallery
+// manifest (npm run generate-asset-versions). Production posters that live in
+// the gallery folder still resolve: they keep their entry in
+// galleryImageRatios.
+export const assetUrl = (path) => withVersion(path, assetVersions[path] ?? galleryImageRatios[path]?.v);
+
+export const assetSrcSet = (srcSet) => srcSet
+  ?.split(', ')
+  .map((entry) => {
+    const [url, ...descriptors] = entry.split(' ');
+    return [assetUrl(url), ...descriptors].join(' ');
+  })
+  .join(', ');
 
 export const gallerySrcSet = (path) => {
   const meta = galleryImageRatios[path];

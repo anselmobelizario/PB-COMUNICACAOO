@@ -1,5 +1,5 @@
 import { Phone, Mail } from 'lucide-react';
-import { siteData } from '../../data/siteData';
+import { siteData, assetUrl, assetSrcSet } from '../../data/siteData';
 
 const socialIcons = {
   facebook: (
@@ -30,8 +30,8 @@ export default function Footer() {
           {/* Brand */}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
             <img
-              src={siteData.company.logoSrc}
-              srcSet="/assets/logo-240.webp 240w, /assets/logo-360.webp 360w, /assets/logo.webp 480w"
+              src={assetUrl(siteData.company.logoSrc)}
+              srcSet={assetSrcSet('/assets/logo-240.webp 240w, /assets/logo-360.webp 360w, /assets/logo.webp 480w')}
               sizes="133px"
               alt={siteData.company.name}
               width={siteData.company.logoWidth}

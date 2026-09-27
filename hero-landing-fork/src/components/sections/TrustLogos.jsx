@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { useReveal } from '../../hooks/useReveal';
 import { getPrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
-import { siteData } from '../../data/siteData';
+import { siteData, assetUrl } from '../../data/siteData';
 
 const FILL_LOGOS = {
   Sonda: 'client-logo-card--sonda',
@@ -76,7 +76,7 @@ function ClientLogoRail({ logos }) {
               className={`client-logo-card${fillClass ? ` client-logo-card--fill ${fillClass}` : ''}`}
             >
               <img
-                src={logo.src}
+                src={assetUrl(logo.src)}
                 alt={`${logo.name}, cliente da P&B`}
                 width={220}
                 height={100}

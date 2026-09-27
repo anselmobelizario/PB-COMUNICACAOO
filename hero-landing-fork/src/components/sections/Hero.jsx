@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Play } from 'lucide-react';
-import { siteData } from '../../data/siteData';
+import { siteData, assetUrl, assetSrcSet } from '../../data/siteData';
 import { getPrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 
 const HERO_VARIANTS = new Set(['a', 'b', 'c']);
@@ -49,20 +49,26 @@ export default function Hero() {
   const sectionRef = useRef(null);
   const videoRef = useRef(null);
   const userPausedRef = useRef(false);
-  const heroVariant = getHeroVariant();
+  // The URL ?hero= variant is applied after hydration: the server prerenders
+  // the default and cannot see the query string.
+  const [heroVariant, setHeroVariant] = useState('a');
 
   const [isReady, setIsReady] = useState(false);
-  const [isPlaybackBlocked, setIsPlaybackBlocked] = useState(getPrefersReducedMotion);
+  // Values that depend on browser APIs start at the server-rendered default
+  // and sync in an effect, so hydration never sees a mismatch.
+  const [isPlaybackBlocked, setIsPlaybackBlocked] = useState(false);
   const [isUserPaused, setIsUserPaused] = useState(false);
-  const [shouldAutoplay] = useState(() => !getPrefersReducedMotion());
-  const [isVideoEnabled, setIsVideoEnabled] = useState(() => {
-    if (typeof window === 'undefined') return true;
-    // Respeita apenas o "Economia de dados" do aparelho; em qualquer tela o
-    // vídeo toca.
-    return navigator.connection?.saveData !== true;
-  });
+  const [isVideoEnabled, setIsVideoEnabled] = useState(true);
 
   const { video, headline, highlight, intro, subheadline } = siteData.hero;
+
+  useEffect(() => {
+    setHeroVariant(getHeroVariant());
+    if (getPrefersReducedMotion()) setIsPlaybackBlocked(true);
+    // Respeita apenas o "Economia de dados" do aparelho; em qualquer tela o
+    // vídeo toca.
+    if (navigator.connection?.saveData === true) setIsVideoEnabled(false);
+  }, []);
 
   const handleSourceError = () => setIsVideoEnabled(false);
 
@@ -72,7 +78,11 @@ export default function Hero() {
 
     if (!isVideoEnabled || !section || !media || getPrefersReducedMotion()) return undefined;
 
-    let isVisible = true;
+    // The video ships with preload="none", so nothing downloads until playback
+    // is actually requested. Start from invisible and let the observer's first
+    // visible callback trigger the fetch — the poster (already high priority)
+    // keeps the network to itself until then.
+    let isVisible = false;
     let recoveryFrame = 0;
 
     const cancelRecoveryFrame = () => {
@@ -163,8 +173,6 @@ export default function Hero() {
     if (media.readyState >= 2) {
       handleCanPlay();
     }
-
-    void playVideo();
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('pointerdown', handleAutoplayRecovery);
@@ -270,8 +278,8 @@ export default function Hero() {
         <div className="hero-media-frame">
           <div className="hero-media-visual" aria-hidden="true">
             <img
-              src={video.poster}
-              srcSet={video.posterSrcSet}
+              src={assetUrl(video.poster)}
+              srcSet={assetSrcSet(video.posterSrcSet)}
               sizes="100vw"
               alt=""
               className="hero-poster"
@@ -287,14 +295,13 @@ export default function Hero() {
               <video
                 ref={videoRef}
                 className={`hero-video ${isReady ? 'is-ready' : ''}`}
-                autoPlay={shouldAutoplay}
                 muted
                 loop
                 playsInline
                 disablePictureInPicture
                 disableRemotePlayback
-                preload="metadata"
-                poster={video.poster}
+                preload="none"
+                poster={assetUrl(video.poster)}
                 width={1920}
                 height={1080}
                 tabIndex={-1}
@@ -302,7 +309,7 @@ export default function Hero() {
                 {video.sources.map((source, index) => (
                   <source
                     key={source.src}
-                    src={source.src}
+                    src={assetUrl(source.src)}
                     type={source.type}
                     media={source.media}
                     onError={index === video.sources.length - 1 ? handleSourceError : undefined}
@@ -329,8 +336,8 @@ export default function Hero() {
         <div className="hero-copy">
           <img
             className="hero-brand-logo"
-            src="/assets/logo-original.webp"
-            srcSet="/assets/logo-original-240.webp 240w, /assets/logo-original-360.webp 360w, /assets/logo-original.webp 480w"
+            src={assetUrl('/assets/logo-original.webp')}
+            srcSet={assetSrcSet('/assets/logo-original-240.webp 240w, /assets/logo-original-360.webp 360w, /assets/logo-original.webp 480w')}
             sizes="min(11.5rem, 48%)"
             alt="P&B Comunicação Visual"
             width={480}

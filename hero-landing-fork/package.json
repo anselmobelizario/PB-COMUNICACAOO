@@ -10,6 +10,7 @@
     "generate-assets": "node scripts/generate-og-image.mjs && node scripts/generate-favicons.mjs",
     "optimize-images": "node scripts/optimize-images.mjs",
     "generate-gallery-ratios": "node scripts/generate-gallery-ratios.mjs",
+    "generate-asset-versions": "node scripts/generate-asset-versions.mjs",
     "lint": "eslint .",
     "test:e2e": "playwright test",
     "test": "npm run test:e2e",

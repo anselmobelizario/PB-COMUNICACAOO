@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useReveal } from '../../hooks/useReveal';
-import { getPrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
-import { siteData } from '../../data/siteData';
+import { siteData, assetUrl } from '../../data/siteData';
 
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 
@@ -9,11 +8,13 @@ function MaterialsVideoCarousel({ videos }) {
   const figureRef = useRef(null);
   const mediaRefs = useRef([]);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isInView, setIsInView] = useState(() => typeof IntersectionObserver === 'undefined');
+  // Browser-dependent values start at the server-rendered default and sync in
+  // effects, so hydration never sees a mismatch.
+  const [isInView, setIsInView] = useState(false);
   const [readyById, setReadyById] = useState({});
   const [errorById, setErrorById] = useState({});
-  const [isReducedMotion, setIsReducedMotion] = useState(getPrefersReducedMotion);
-  const [isPlaybackEnabled, setIsPlaybackEnabled] = useState(() => !getPrefersReducedMotion());
+  const [isReducedMotion, setIsReducedMotion] = useState(false);
+  const [isPlaybackEnabled, setIsPlaybackEnabled] = useState(true);
 
   const videoCount = videos.length;
   const activeVideo = videos[activeIndex];
@@ -21,7 +22,11 @@ function MaterialsVideoCarousel({ videos }) {
 
   useEffect(() => {
     const figure = figureRef.current;
-    if (!figure || typeof IntersectionObserver === 'undefined') return undefined;
+    if (!figure) return undefined;
+    if (typeof IntersectionObserver === 'undefined') {
+      setIsInView(true);
+      return undefined;
+    }
 
     const observer = new IntersectionObserver(
       ([entry]) => setIsInView(entry.isIntersecting),
@@ -41,6 +46,7 @@ function MaterialsVideoCarousel({ videos }) {
       if (event.matches) setIsPlaybackEnabled(false);
     };
 
+    handlePreferenceChange({ matches: mediaQuery.matches });
     mediaQuery.addEventListener?.('change', handlePreferenceChange);
     return () => mediaQuery.removeEventListener?.('change', handlePreferenceChange);
   }, []);
@@ -117,7 +123,7 @@ function MaterialsVideoCarousel({ videos }) {
             >
               <img
                 className={isReady && isActive && shouldPlay ? 'is-hidden' : ''}
-                src={video.poster}
+                src={assetUrl(video.poster)}
                 alt={isActive ? video.alt : ''}
                 width={video.width}
                 height={video.height}
@@ -147,7 +153,7 @@ function MaterialsVideoCarousel({ videos }) {
                   onEnded={isActive ? handleVideoEnded : undefined}
                 >
                   <source
-                    src={video.src}
+                    src={assetUrl(video.src)}
                     type="video/mp4"
                     onError={() => {
                       setErrorById((current) => ({ ...current, [video.id]: true }));

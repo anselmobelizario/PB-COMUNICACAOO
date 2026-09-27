@@ -1,14 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
+import { assetUrl } from '../../data/siteData';
 
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 // Stage swap runs on a 720ms CSS animation; if its animationend never fires
 // (tab hidden mid-flight, animation canceled) the controls would stay locked.
 const LEAF_TRANSITION_FALLBACK_MS = 1200;
-
-function getReducedMotionPreference() {
-  return typeof window !== 'undefined'
-    && window.matchMedia?.(REDUCED_MOTION_QUERY).matches;
-}
 
 function VideoSlide({
   video,
@@ -60,7 +56,7 @@ function VideoSlide({
     >
       <img
         className={isReady ? 'is-hidden' : ''}
-        src={video.poster}
+        src={assetUrl(video.poster)}
         alt={isVisible ? video.alt : ''}
         width={1280}
         height={720}
@@ -81,7 +77,7 @@ function VideoSlide({
           onEnded={onEnded}
         >
           <source
-            src={video.src}
+            src={assetUrl(video.src)}
             type="video/mp4"
             onError={() => {
               setHasError(true);
@@ -100,10 +96,12 @@ export default function PortfolioVideoCarousel({ videos }) {
   const carouselRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [transition, setTransition] = useState(null);
-  const [isInView, setIsInView] = useState(() => typeof IntersectionObserver === 'undefined');
-  const [isReducedMotion, setIsReducedMotion] = useState(getReducedMotionPreference);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(() => !getReducedMotionPreference());
-  const [isPlaybackEnabled, setIsPlaybackEnabled] = useState(() => !getReducedMotionPreference());
+  // Browser-dependent values start at the server-rendered default and sync in
+  // effects, so hydration never sees a mismatch.
+  const [isInView, setIsInView] = useState(false);
+  const [isReducedMotion, setIsReducedMotion] = useState(false);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [isPlaybackEnabled, setIsPlaybackEnabled] = useState(true);
 
   const videoCount = videos.length;
   const activeVideo = videos[activeIndex];
@@ -114,7 +112,10 @@ export default function PortfolioVideoCarousel({ videos }) {
   useEffect(() => {
     const carousel = carouselRef.current;
     if (!carousel) return undefined;
-    if (typeof IntersectionObserver === 'undefined') return undefined;
+    if (typeof IntersectionObserver === 'undefined') {
+      setIsInView(true);
+      return undefined;
+    }
 
     const observer = new IntersectionObserver(
       ([entry]) => setIsInView(entry.isIntersecting),
@@ -137,6 +138,7 @@ export default function PortfolioVideoCarousel({ videos }) {
       }
     };
 
+    handlePreferenceChange({ matches: media.matches });
     media.addEventListener?.('change', handlePreferenceChange);
     return () => media.removeEventListener?.('change', handlePreferenceChange);
   }, []);

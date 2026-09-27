@@ -398,7 +398,7 @@
       ]
     },
     {
-      "source": "/assets/gallery/(.*)",
+      "source": "/assets/(.*)",
       "has": [
         {
           "type": "query",
