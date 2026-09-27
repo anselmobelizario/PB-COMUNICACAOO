@@ -130,6 +130,10 @@ export default defineConfig(({ mode }) => {
     build: {
       target: 'es2020',
       cssCodeSplit: true,
+      // Hashed bundles live under /_app/*, which is the only path (besides
+      // gallery URLs carrying ?v=) that vercel.json lets be cached as
+      // immutable — public/ keeps stable names and gets a 1-day cache.
+      assetsDir: '_app',
       rollupOptions: {
         output: {
           manualChunks(id) {
