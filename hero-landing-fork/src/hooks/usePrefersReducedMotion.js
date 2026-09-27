@@ -7,7 +7,9 @@ export function getPrefersReducedMotion() {
 }
 
 export function usePrefersReducedMotion() {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(getPrefersReducedMotion);
+  // Starts at the server default; the effect syncs the real preference before
+  // anything interactive happens, keeping hydration mismatch-free.
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia?.(QUERY);
