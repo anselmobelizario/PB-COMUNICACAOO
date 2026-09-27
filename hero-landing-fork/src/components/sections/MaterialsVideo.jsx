@@ -136,7 +136,8 @@ function MaterialsVideoCarousel({ videos }) {
                   disablePictureInPicture
                   disableRemotePlayback
                   preload={isActive && shouldPlay ? 'auto' : 'none'}
-                  poster={video.poster}
+                  // No poster: the lazy <img> twin above already shows it, and
+                  // an eager poster attr pulled every slide's image up front.
                   width={video.width}
                   height={video.height}
                   tabIndex={-1}

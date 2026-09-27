@@ -75,7 +75,8 @@ function VideoSlide({
           muted
           playsInline
           preload={isPlayable && isInView && shouldPlay ? 'auto' : 'none'}
-          poster={video.poster}
+          // No poster: the lazy <img> above already shows one, and a poster
+          // attr fetched every slide's image on page load.
           onPlaying={() => setIsReady(true)}
           onEnded={onEnded}
         >

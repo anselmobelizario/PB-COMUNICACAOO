@@ -296,6 +296,8 @@ export default function Hero() {
           <img
             className="hero-brand-logo"
             src="/assets/logo-original.webp"
+            srcSet="/assets/logo-original-240.webp 240w, /assets/logo-original-360.webp 360w, /assets/logo-original.webp 480w"
+            sizes="min(11.5rem, 48%)"
             alt="P&B Comunicação Visual"
             width={480}
             height={362}

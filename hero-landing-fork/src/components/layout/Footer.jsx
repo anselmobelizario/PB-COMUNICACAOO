@@ -31,9 +31,13 @@ export default function Footer() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
             <img
               src={siteData.company.logoSrc}
+              srcSet="/assets/logo-240.webp 240w, /assets/logo-360.webp 360w, /assets/logo.webp 480w"
+              sizes="133px"
               alt={siteData.company.name}
               width={siteData.company.logoWidth}
               height={siteData.company.logoHeight}
+              loading="lazy"
+              decoding="async"
               className="h-20 w-auto flex-shrink-0 self-start sm:h-24 sm:self-center"
             />
             <div>
