@@ -57,28 +57,27 @@ function useDeepLinkScroll() {
     const scrollToHash = () => {
       const id = window.location.hash.slice(1)
       if (!id) return
-      let frames = 0
-      // Lazy sections mount after the browser's own anchor attempt, so keep
-      // looking for a few seconds before giving up.
+      const startedAt = Date.now()
+      // setTimeout, not rAF: rAF freezes in background tabs and would strand
+      // a link opened off-foreground with no scroll at all.
       const look = () => {
         if (cancelled) return
         const target = document.getElementById(id)
         if (!target) {
-          if (frames++ < 300) requestAnimationFrame(look)
+          if (Date.now() - startedAt < 10000) setTimeout(look, 120)
           return
         }
         target.scrollIntoView({ behavior: 'instant', block: 'start' })
         // Lazy media keeps resizing the page after the first jump; nudge the
         // scroll back until the layout settles — unless the user scrolls.
-        const start = Date.now()
         const settle = () => {
           if (cancelled || userMoved) return
           if (Math.abs(target.getBoundingClientRect().top) > 2) {
             target.scrollIntoView({ behavior: 'instant', block: 'start' })
           }
-          if (Date.now() - start < 2500) requestAnimationFrame(settle)
+          if (Date.now() - startedAt < 12000) setTimeout(settle, 150)
         }
-        requestAnimationFrame(settle)
+        setTimeout(settle, 150)
       }
       look()
     }
