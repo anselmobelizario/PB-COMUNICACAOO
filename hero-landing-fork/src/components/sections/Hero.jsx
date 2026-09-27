@@ -150,6 +150,25 @@ export default function Hero() {
       setIsVideoEnabled(false);
     };
 
+    // <source media> is only evaluated while parsing: a loaded clip that
+    // outlives an orientation change must reload to pick the matching source.
+    // With preload="none" an untouched clip resolves its source at first play
+    // and needs nothing here.
+    const mediaQueries = [...new Set(
+      siteData.hero.video.sources.map((source) => source.media).filter(Boolean),
+    )];
+    const matchers = mediaQueries.map((query) => window.matchMedia(query));
+
+    const handleOrientationChange = () => {
+      if (media.readyState === 0 || !isVisible || document.hidden) return;
+      media.load();
+      if (getPrefersReducedMotion() || userPausedRef.current) return;
+      media.muted = true;
+      media.play()?.catch?.(() => {});
+    };
+
+    matchers.forEach((matcher) => matcher.addEventListener('change', handleOrientationChange));
+
     const io = new IntersectionObserver(
       ([entry]) => {
         isVisible = entry.isIntersecting;
@@ -182,6 +201,7 @@ export default function Hero() {
 
     return () => {
       io.disconnect();
+      matchers.forEach((matcher) => matcher.removeEventListener('change', handleOrientationChange));
       media.removeEventListener('loadeddata', handleCanPlay);
       media.removeEventListener('canplay', handleCanPlay);
       media.removeEventListener('playing', handleCanPlay);
@@ -191,33 +211,6 @@ export default function Hero() {
       window.removeEventListener('touchstart', handleAutoplayRecovery);
       window.removeEventListener('keydown', handleAutoplayRecovery);
       pauseVideo();
-    };
-  }, [isVideoEnabled]);
-
-  useEffect(() => {
-    const media = videoRef.current;
-    if (!isVideoEnabled || !media) return undefined;
-
-    const mediaQueries = [...new Set(
-      siteData.hero.video.sources.map((source) => source.media).filter(Boolean),
-    )];
-    if (!mediaQueries.length) return undefined;
-
-    const matchers = mediaQueries.map((query) => window.matchMedia(query));
-
-    const handleOrientationChange = () => {
-      // <source media> is only evaluated while parsing, so a portrait clip
-      // stays loaded after rotating to landscape. Reload picks the matching
-      // source; the poster stays visible until canplay refires.
-      media.load();
-      if (getPrefersReducedMotion() || userPausedRef.current) return;
-      media.muted = true;
-      media.play()?.catch?.(() => {});
-    };
-
-    matchers.forEach((matcher) => matcher.addEventListener('change', handleOrientationChange));
-    return () => {
-      matchers.forEach((matcher) => matcher.removeEventListener('change', handleOrientationChange));
     };
   }, [isVideoEnabled]);
 

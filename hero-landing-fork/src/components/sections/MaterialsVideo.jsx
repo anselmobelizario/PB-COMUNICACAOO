@@ -23,6 +23,12 @@ function MaterialsVideoCarousel({ videos }) {
   useEffect(() => {
     const figure = figureRef.current;
     if (!figure) return undefined;
+    // Pre-2019 browsers: keep the carousel playing rather than crashing.
+    if (typeof IntersectionObserver === 'undefined') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setIsInView(true);
+      return undefined;
+    }
 
     const observer = new IntersectionObserver(
       ([entry]) => setIsInView(entry.isIntersecting),

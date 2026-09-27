@@ -8,6 +8,9 @@ test.describe('site institucional P&B', () => {
   const openPage = async (page, path = '/') => {
     await page.goto(path, { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('html[data-hydrated="true"]');
+    // The flag marks the root commit; lazy section chunks still land after
+    // it, and networkidle is the cheap deterministic wait for those.
+    await page.waitForLoadState('networkidle');
   };
   test('apresenta a proposta e permite filtrar o portfólio', async ({ page }) => {
     await openPage(page, '/');
@@ -156,6 +159,7 @@ test.describe('site institucional P&B', () => {
 
     await page.setViewportSize({ width: 390, height: 844 });
     await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('html[data-hydrated="true"]');
     const menuButton = page.getByRole('button', { name: 'Abrir menu' });
     await menuButton.click();
     await expect(page.getByRole('dialog', { name: 'Menu de navegação' })).toBeVisible();

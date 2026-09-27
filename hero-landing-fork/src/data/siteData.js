@@ -38,17 +38,23 @@ export const assetSrcSet = (srcSet) => srcSet
 // URL so call sites can pass whatever they already hold.
 export const avifUrl = (path) => {
   const [bare] = path.split('?');
+  if (!/\.(webp|jpe?g)$/i.test(bare)) return undefined;
   const version = assetVersions[bare] ?? galleryImageRatios[bare]?.v;
   return version ? `${bare.replace(/\.(webp|jpe?g)$/i, '.avif')}?v=${version}` : undefined;
 };
 
-export const avifSrcSet = (srcSet) => srcSet
-  ?.split(', ')
-  .map((entry) => {
-    const [url, ...descriptors] = entry.split(' ');
-    return [avifUrl(url), ...descriptors].join(' ');
-  })
-  .join(', ');
+export const avifSrcSet = (srcSet) => {
+  if (!srcSet) return undefined;
+  const candidates = srcSet
+    .split(', ')
+    .map((entry) => {
+      const [url, ...descriptors] = entry.split(' ');
+      const avif = avifUrl(url);
+      return avif ? [avif, ...descriptors].join(' ') : null;
+    })
+    .filter(Boolean);
+  return candidates.length ? candidates.join(', ') : undefined;
+};
 
 export const gallerySrcSet = (path) => {
   const meta = galleryImageRatios[path];
