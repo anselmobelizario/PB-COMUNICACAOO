@@ -49,6 +49,7 @@ function useDeepLinkScroll() {
   useEffect(() => {
     let cancelled = false
     let userMoved = false
+    let generation = 0
     const markUserMoved = () => { userMoved = true }
     window.addEventListener('wheel', markUserMoved, { passive: true, once: true })
     window.addEventListener('touchmove', markUserMoved, { passive: true, once: true })
@@ -57,11 +58,15 @@ function useDeepLinkScroll() {
     const scrollToHash = () => {
       const id = window.location.hash.slice(1)
       if (!id) return
+      // A newer hash retires the previous hash's wait/settle loops — without
+      // this two generations would fight over the scroll position.
+      generation += 1
+      const mine = generation
       const startedAt = Date.now()
       // setTimeout, not rAF: rAF freezes in background tabs and would strand
       // a link opened off-foreground with no scroll at all.
       const look = () => {
-        if (cancelled) return
+        if (cancelled || mine !== generation) return
         const target = document.getElementById(id)
         if (!target) {
           if (Date.now() - startedAt < 10000) setTimeout(look, 120)
@@ -71,7 +76,7 @@ function useDeepLinkScroll() {
         // Lazy media keeps resizing the page after the first jump; nudge the
         // scroll back until the layout settles — unless the user scrolls.
         const settle = () => {
-          if (cancelled || userMoved) return
+          if (cancelled || userMoved || mine !== generation) return
           if (Math.abs(target.getBoundingClientRect().top) > 2) {
             target.scrollIntoView({ behavior: 'instant', block: 'start' })
           }

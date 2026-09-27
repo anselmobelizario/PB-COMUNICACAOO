@@ -201,7 +201,7 @@ export default function Hero() {
       // stays loaded after rotating to landscape. Reload picks the matching
       // source; the poster stays visible until canplay refires.
       media.load();
-      if (getPrefersReducedMotion()) return;
+      if (getPrefersReducedMotion() || userPausedRef.current) return;
       media.muted = true;
       media.play()?.catch?.(() => {});
     };
