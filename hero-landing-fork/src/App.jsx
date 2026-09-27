@@ -102,6 +102,12 @@ function useDeepLinkScroll() {
 function App() {
   useDeepLinkScroll()
 
+  // Prerendered markup is interactive only once hydration finishes; this
+  // marks the moment for the e2e suite (and any perf probing).
+  useEffect(() => {
+    document.documentElement.dataset.hydrated = 'true'
+  }, [])
+
   return (
     <>
       <a href="#content" className="skip-link">

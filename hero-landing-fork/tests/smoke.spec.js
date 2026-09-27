@@ -3,8 +3,14 @@ import { expect, test } from '@playwright/test';
 import { buildGalleryManifest } from '../scripts/generate-gallery-ratios.mjs';
 
 test.describe('site institucional P&B', () => {
+  // The page ships prerendered: elements exist before React hydrates, so
+  // every navigation waits for the hydrated flag before interacting.
+  const openPage = async (page, path = '/') => {
+    await page.goto(path, { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('html[data-hydrated="true"]');
+  };
   test('apresenta a proposta e permite filtrar o portfólio', async ({ page }) => {
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await openPage(page, '/');
 
     await expect(page.locator('h1')).toContainText('24 anos.');
     await expect(page.locator('h1')).toContainText('Causando impacto.');
@@ -44,7 +50,7 @@ test.describe('site institucional P&B', () => {
   });
 
   test('a aba Essência P&B anuncia vídeos em vez de fotos e não abre mosaico vazio', async ({ page }) => {
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await openPage(page, '/');
 
     const portfolio = page.locator('#portfolio');
     await portfolio.scrollIntoViewIfNeeded();
@@ -73,7 +79,7 @@ test.describe('site institucional P&B', () => {
   });
 
   test('apresenta o showreel de vídeos com navegação e pausa', async ({ page }) => {
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await openPage(page, '/');
 
     const carousel = page.locator('.portfolio-video-carousel');
     await carousel.scrollIntoViewIfNeeded();
@@ -108,7 +114,7 @@ test.describe('site institucional P&B', () => {
 
   test('respeita carregamento sob demanda e movimento reduzido no showreel', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await openPage(page, '/');
 
     const carousel = page.locator('.portfolio-video-carousel');
     await expect(carousel.locator('img').first()).toHaveAttribute('loading', 'lazy');
@@ -129,7 +135,7 @@ test.describe('site institucional P&B', () => {
   });
 
   test('mantém FAQ, orçamento e menu mobile operacionais', async ({ page }) => {
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await openPage(page, '/');
 
     const faq = page.locator('#faq');
     await faq.scrollIntoViewIfNeeded();
@@ -160,7 +166,7 @@ test.describe('site institucional P&B', () => {
   test('mantém o menu mobile compacto e alcançável em qualquer celular', async ({ page }) => {
     for (const [width, height] of [[320, 568], [390, 844], [667, 375]]) {
       await page.setViewportSize({ width, height });
-      await page.goto('/', { waitUntil: 'domcontentloaded' });
+      await openPage(page, '/');
       await page.getByRole('button', { name: 'Abrir menu' }).click();
       const drawer = page.getByRole('dialog', { name: 'Menu de navegação' });
       await expect(drawer).toBeVisible();
@@ -192,7 +198,7 @@ test.describe('site institucional P&B', () => {
   test('mantém o botão flutuante do WhatsApp no canto em qualquer tela', async ({ page }) => {
     for (const [width, height] of [[1280, 800], [320, 568]]) {
       await page.setViewportSize({ width, height });
-      await page.goto('/', { waitUntil: 'domcontentloaded' });
+      await openPage(page, '/');
 
       const button = page.getByRole('link', { name: 'Fale conosco pelo WhatsApp' });
       await expect(button).toHaveAttribute('href', /api\.whatsapp\.com\/send\?phone=5511965698725/);
@@ -224,7 +230,7 @@ test.describe('site institucional P&B', () => {
   });
 
   test('versiona as fotos da galeria em todas as variantes do srcset e no lightbox', async ({ page }) => {
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await openPage(page, '/');
 
     const portfolio = page.locator('#portfolio');
     await portfolio.scrollIntoViewIfNeeded();
@@ -255,7 +261,7 @@ test.describe('site institucional P&B', () => {
 
   test('reproduz o texto e as cores aprovadas no overlay do vídeo', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
-    await page.goto('/?hero=a', { waitUntil: 'domcontentloaded' });
+    await openPage(page, '/?hero=a');
 
     const hero = page.locator('.hero-section');
     await expect(hero).toHaveClass(/hero-overlay/);
@@ -327,12 +333,12 @@ test.describe('site institucional P&B', () => {
     await page.setViewportSize({ width: 1280, height: 900 });
 
     for (const variant of variants) {
-      await page.goto(`/${variant.query}`, { waitUntil: 'domcontentloaded' });
+      await openPage(page, `/${variant.query}`);
       await expect(page.locator('.hero-section')).toHaveAttribute('data-hero-variant', variant.name);
     }
 
     const geometry = async (query) => {
-      await page.goto(`/${query}`, { waitUntil: 'domcontentloaded' });
+      await openPage(page, `/${query}`);
       return page.evaluate(() => {
         const shellElement = document.querySelector('.hero-shell');
         const copyElement = document.querySelector('.hero-copy');
