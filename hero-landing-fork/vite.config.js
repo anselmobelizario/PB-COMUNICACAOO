@@ -117,6 +117,9 @@ const versionedHtmlPaths = [
   '/assets/hero/hero-video-02-poster-640.webp',
   '/assets/hero/hero-video-02-poster-960.webp',
   '/assets/hero/hero-video-02-poster-1280.webp',
+  '/assets/logo-original-240.webp',
+  '/assets/logo-original-360.webp',
+  '/assets/logo-original.webp',
   '/assets/fonts/space-grotesk-var.woff2',
   '/assets/fonts/plus-jakarta-sans-var.woff2',
 ]

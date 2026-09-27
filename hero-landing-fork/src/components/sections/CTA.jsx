@@ -8,7 +8,7 @@ export default function CTA() {
   const trustPoints = siteData.ctaBanner.trustLine.split(' • ');
 
   return (
-    <section aria-labelledby="cta-heading" className="relative z-10 overflow-hidden bg-[var(--color-pb-surface)] px-6 py-6">
+    <section id="orcamento" aria-labelledby="cta-heading" className="relative z-10 overflow-hidden bg-[var(--color-pb-surface)] px-6 py-6">
       <div ref={revealRef} className="reveal-section mx-auto max-w-7xl">
         <div className="cta-panel-light rounded-[2rem] p-8 sm:p-10 lg:p-12">
           <div className="grid gap-10 md:grid-cols-2 md:items-center md:gap-8 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] lg:gap-12">
