@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Car, Flag, PaintRoller, Store } from 'lucide-react';
 import { useReveal } from '../../hooks/useReveal';
 import { getPrefersReducedMotion, usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
-import { gallerySrcSet, galleryUrl, siteData } from '../../data/siteData';
+import { avifSrcSet, avifUrl, gallerySrcSet, galleryUrl, siteData } from '../../data/siteData';
 
 const SERVICE_IMAGE_SIZES = '(min-width: 768px) 38rem, 92vw';
 
@@ -133,23 +133,33 @@ function ServiceCard({ service, index, ctaText }) {
 
         <div className="service-card-media relative flex-shrink-0 overflow-hidden md:w-[55%]">
           {gallery.map((item, galleryIndex) => (
-            <img
-              key={item.src}
-              src={galleryUrl(item.src)}
-              srcSet={gallerySrcSet(item.src)}
-              sizes={SERVICE_IMAGE_SIZES}
-              alt={galleryIndex === slide ? service.title : ''}
-              aria-hidden={galleryIndex === slide ? undefined : 'true'}
-              className="absolute inset-0 h-full w-full object-cover transition-opacity duration-1000"
-              style={{
-                zIndex: galleryIndex === slide ? 2 : 1,
-                opacity: galleryIndex === slide ? 1 : 0,
-                ...(item.objectPosition ? { objectPosition: item.objectPosition } : null),
-                ...(item.objectFit ? { objectFit: item.objectFit } : null),
-              }}
-              loading="lazy"
-              decoding="async"
-            />
+            <picture key={item.src}>
+              {gallerySrcSet(item.src) ? (
+                <source
+                  type="image/avif"
+                  srcSet={avifSrcSet(gallerySrcSet(item.src))}
+                  sizes={SERVICE_IMAGE_SIZES}
+                />
+              ) : (
+                <source type="image/avif" srcSet={avifUrl(galleryUrl(item.src))} />
+              )}
+              <img
+                src={galleryUrl(item.src)}
+                srcSet={gallerySrcSet(item.src)}
+                sizes={SERVICE_IMAGE_SIZES}
+                alt={galleryIndex === slide ? service.title : ''}
+                aria-hidden={galleryIndex === slide ? undefined : 'true'}
+                className="absolute inset-0 h-full w-full object-cover transition-opacity duration-1000"
+                style={{
+                  zIndex: galleryIndex === slide ? 2 : 1,
+                  opacity: galleryIndex === slide ? 1 : 0,
+                  ...(item.objectPosition ? { objectPosition: item.objectPosition } : null),
+                  ...(item.objectFit ? { objectFit: item.objectFit } : null),
+                }}
+                loading="lazy"
+                decoding="async"
+              />
+            </picture>
           ))}
           <div className="service-media-overlay" aria-hidden="true" />
 

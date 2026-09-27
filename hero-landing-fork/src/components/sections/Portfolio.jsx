@@ -4,7 +4,7 @@ import { useFlushColumns } from '../../hooks/useFlushColumns';
 import { useReveal } from '../../hooks/useReveal';
 import { useScrollLock } from '../../hooks/useScrollLock';
 import { getPrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
-import { siteData } from '../../data/siteData';
+import { avifSrcSet, avifUrl, siteData } from '../../data/siteData';
 import PortfolioVideoCarousel from './PortfolioVideoCarousel';
 import ProjectMosaic from './PortfolioMosaic';
 
@@ -134,7 +134,10 @@ function Lightbox({ items, index, onClose, onPrev, onNext, onJump }) {
       </button>
 
       <div className="portfolio-lightbox-stage" onClick={(event) => event.stopPropagation()}>
-        <img src={item.src} alt={item.alt} />
+        <picture>
+          <source type="image/avif" srcSet={avifUrl(item.src)} />
+          <img src={item.src} alt={item.alt} />
+        </picture>
         <div className="portfolio-lightbox-caption">
           <span>{item.categoryLabel}</span>
         </div>
@@ -151,16 +154,21 @@ function Lightbox({ items, index, onClose, onPrev, onNext, onJump }) {
               aria-label={`Visualizar ${thumbnail.alt}`}
               aria-current={thumbnailIndex === index ? 'true' : undefined}
             >
-              <img
-                src={thumbnail.src}
-                srcSet={thumbnail.srcSet}
-                sizes="96px"
-                alt=""
-                width={96}
-                height={64}
-                loading="lazy"
-                decoding="async"
-              />
+              <picture>
+                {thumbnail.srcSet && (
+                  <source type="image/avif" srcSet={avifSrcSet(thumbnail.srcSet)} sizes="96px" />
+                )}
+                <img
+                  src={thumbnail.src}
+                  srcSet={thumbnail.srcSet}
+                  sizes="96px"
+                  alt=""
+                  width={96}
+                  height={64}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </picture>
             </button>
           ))}
         </div>

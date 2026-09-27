@@ -1,3 +1,5 @@
+import { avifSrcSet, avifUrl } from '../../data/siteData';
+
 function mosaicRows(images, size) {
   const rows = [];
 
@@ -16,17 +18,24 @@ function MosaicTile({ image, imageIndex, startIndex, onOpenLightbox, isHero }) {
       onClick={() => onOpenLightbox(startIndex + imageIndex)}
       aria-label={`Ampliar ${image.alt}`}
     >
-      <img
-        src={image.src}
-        srcSet={image.srcSet}
-        sizes={image.sizes}
-        alt={image.alt}
-        width={image.width}
-        height={image.height}
-        style={image.objectPosition ? { objectPosition: image.objectPosition } : undefined}
-        loading="lazy"
-        decoding="async"
-      />
+      <picture>
+        <source
+          type="image/avif"
+          srcSet={image.srcSet ? avifSrcSet(image.srcSet) : avifUrl(image.src)}
+          sizes={image.sizes}
+        />
+        <img
+          src={image.src}
+          srcSet={image.srcSet}
+          sizes={image.sizes}
+          alt={image.alt}
+          width={image.width}
+          height={image.height}
+          style={image.objectPosition ? { objectPosition: image.objectPosition } : undefined}
+          loading="lazy"
+          decoding="async"
+        />
+      </picture>
       <span className="portfolio-mosaic-tile-hint" aria-hidden="true">Ampliar</span>
     </button>
   );

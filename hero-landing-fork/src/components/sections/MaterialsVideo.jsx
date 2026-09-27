@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useReveal } from '../../hooks/useReveal';
-import { siteData, assetUrl } from '../../data/siteData';
+import { siteData, assetUrl, avifUrl } from '../../data/siteData';
 
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 
@@ -23,10 +23,6 @@ function MaterialsVideoCarousel({ videos }) {
   useEffect(() => {
     const figure = figureRef.current;
     if (!figure) return undefined;
-    if (typeof IntersectionObserver === 'undefined') {
-      setIsInView(true);
-      return undefined;
-    }
 
     const observer = new IntersectionObserver(
       ([entry]) => setIsInView(entry.isIntersecting),
@@ -121,15 +117,18 @@ function MaterialsVideoCarousel({ videos }) {
               aria-label={video.alt}
               aria-hidden={!isActive}
             >
-              <img
-                className={isReady && isActive && shouldPlay ? 'is-hidden' : ''}
-                src={assetUrl(video.poster)}
-                alt={isActive ? video.alt : ''}
-                width={video.width}
-                height={video.height}
-                loading={isActive && isInView ? 'eager' : 'lazy'}
-                decoding="async"
-              />
+              <picture>
+                <source type="image/avif" srcSet={avifUrl(video.poster)} />
+                <img
+                  className={isReady && isActive && shouldPlay ? 'is-hidden' : ''}
+                  src={assetUrl(video.poster)}
+                  alt={isActive ? video.alt : ''}
+                  width={video.width}
+                  height={video.height}
+                  loading={isActive && isInView ? 'eager' : 'lazy'}
+                  decoding="async"
+                />
+              </picture>
               {!hasError && (
                 <video
                   ref={(node) => {

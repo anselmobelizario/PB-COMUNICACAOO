@@ -33,6 +33,23 @@ export const assetSrcSet = (srcSet) => srcSet
   })
   .join(', ');
 
+// AVIF twins are generated next to the source images (npm run generate-avif)
+// and share their ?v= version. Accepts both the raw and the already-versioned
+// URL so call sites can pass whatever they already hold.
+export const avifUrl = (path) => {
+  const [bare] = path.split('?');
+  const version = assetVersions[bare] ?? galleryImageRatios[bare]?.v;
+  return version ? `${bare.replace(/\.(webp|jpe?g)$/i, '.avif')}?v=${version}` : undefined;
+};
+
+export const avifSrcSet = (srcSet) => srcSet
+  ?.split(', ')
+  .map((entry) => {
+    const [url, ...descriptors] = entry.split(' ');
+    return [avifUrl(url), ...descriptors].join(' ');
+  })
+  .join(', ');
+
 export const gallerySrcSet = (path) => {
   const meta = galleryImageRatios[path];
   if (!meta || meta.width <= 800) return undefined;

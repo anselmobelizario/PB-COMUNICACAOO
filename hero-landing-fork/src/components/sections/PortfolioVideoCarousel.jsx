@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { assetUrl } from '../../data/siteData';
+import { assetUrl, avifUrl } from '../../data/siteData';
 
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 // Stage swap runs on a 720ms CSS animation; if its animationend never fires
@@ -54,15 +54,18 @@ function VideoSlide({
       data-direction={direction}
       onAnimationEnd={onAnimationEnd}
     >
-      <img
-        className={isReady ? 'is-hidden' : ''}
-        src={assetUrl(video.poster)}
-        alt={isVisible ? video.alt : ''}
-        width={1280}
-        height={720}
-        loading={mode === 'active' && isInView ? 'eager' : 'lazy'}
-        decoding="async"
-      />
+      <picture>
+        <source type="image/avif" srcSet={avifUrl(video.poster)} />
+        <img
+          className={isReady ? 'is-hidden' : ''}
+          src={assetUrl(video.poster)}
+          alt={isVisible ? video.alt : ''}
+          width={1280}
+          height={720}
+          loading={mode === 'active' && isInView ? 'eager' : 'lazy'}
+          decoding="async"
+        />
+      </picture>
       {!hasError && (
         <video
           ref={mediaRef}
@@ -112,10 +115,6 @@ export default function PortfolioVideoCarousel({ videos }) {
   useEffect(() => {
     const carousel = carouselRef.current;
     if (!carousel) return undefined;
-    if (typeof IntersectionObserver === 'undefined') {
-      setIsInView(true);
-      return undefined;
-    }
 
     const observer = new IntersectionObserver(
       ([entry]) => setIsInView(entry.isIntersecting),

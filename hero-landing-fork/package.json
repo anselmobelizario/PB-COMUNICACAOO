@@ -11,6 +11,7 @@
     "optimize-images": "node scripts/optimize-images.mjs",
     "generate-gallery-ratios": "node scripts/generate-gallery-ratios.mjs",
     "generate-asset-versions": "node scripts/generate-asset-versions.mjs",
+    "generate-avif": "node scripts/generate-avif.mjs",
     "lint": "eslint .",
     "test:e2e": "playwright test",
     "test": "npm run test:e2e",
