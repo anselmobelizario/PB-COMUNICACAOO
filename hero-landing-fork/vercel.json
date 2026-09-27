@@ -2,7 +2,12 @@
   "redirects": [
     {
       "source": "/(.*)",
-      "has": [{ "type": "host", "value": "pb-comunicacao.vercel.app" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "pb-comunicacao.vercel.app"
+        }
+      ],
       "destination": "https://pbcomunicacao.com.br$1",
       "permanent": true
     },
@@ -174,6 +179,186 @@
     {
       "source": "/category/fabricacao-totens/",
       "destination": "/#servicos",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio",
+      "destination": "/#portfolio",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio/",
+      "destination": "/#portfolio",
+      "permanent": true
+    },
+    {
+      "source": "/nosso-portfolio",
+      "destination": "/#portfolio",
+      "permanent": true
+    },
+    {
+      "source": "/nosso-portfolio/",
+      "destination": "/#portfolio",
+      "permanent": true
+    },
+    {
+      "source": "/nossos-portfolio",
+      "destination": "/#portfolio",
+      "permanent": true
+    },
+    {
+      "source": "/nossos-portfolio/",
+      "destination": "/#portfolio",
+      "permanent": true
+    },
+    {
+      "source": "/portifolio",
+      "destination": "/#portfolio",
+      "permanent": true
+    },
+    {
+      "source": "/portifolio/",
+      "destination": "/#portfolio",
+      "permanent": true
+    },
+    {
+      "source": "/galeria",
+      "destination": "/#portfolio",
+      "permanent": true
+    },
+    {
+      "source": "/galeria/",
+      "destination": "/#portfolio",
+      "permanent": true
+    },
+    {
+      "source": "/servicos",
+      "destination": "/#servicos",
+      "permanent": true
+    },
+    {
+      "source": "/servicos/",
+      "destination": "/#servicos",
+      "permanent": true
+    },
+    {
+      "source": "/nossos-servicos",
+      "destination": "/#servicos",
+      "permanent": true
+    },
+    {
+      "source": "/nossos-servicos/",
+      "destination": "/#servicos",
+      "permanent": true
+    },
+    {
+      "source": "/produtos",
+      "destination": "/#servicos",
+      "permanent": true
+    },
+    {
+      "source": "/produtos/",
+      "destination": "/#servicos",
+      "permanent": true
+    },
+    {
+      "source": "/sobre",
+      "destination": "/#sobre",
+      "permanent": true
+    },
+    {
+      "source": "/sobre/",
+      "destination": "/#sobre",
+      "permanent": true
+    },
+    {
+      "source": "/sobre-nos",
+      "destination": "/#sobre",
+      "permanent": true
+    },
+    {
+      "source": "/sobre-nos/",
+      "destination": "/#sobre",
+      "permanent": true
+    },
+    {
+      "source": "/quem-somos",
+      "destination": "/#sobre",
+      "permanent": true
+    },
+    {
+      "source": "/quem-somos/",
+      "destination": "/#sobre",
+      "permanent": true
+    },
+    {
+      "source": "/empresa",
+      "destination": "/#sobre",
+      "permanent": true
+    },
+    {
+      "source": "/empresa/",
+      "destination": "/#sobre",
+      "permanent": true
+    },
+    {
+      "source": "/midia",
+      "destination": "/#sobre",
+      "permanent": true
+    },
+    {
+      "source": "/midia/",
+      "destination": "/#sobre",
+      "permanent": true
+    },
+    {
+      "source": "/contato",
+      "destination": "/#contato",
+      "permanent": true
+    },
+    {
+      "source": "/contato/",
+      "destination": "/#contato",
+      "permanent": true
+    },
+    {
+      "source": "/fale-conosco",
+      "destination": "/#contato",
+      "permanent": true
+    },
+    {
+      "source": "/fale-conosco/",
+      "destination": "/#contato",
+      "permanent": true
+    },
+    {
+      "source": "/orcamento",
+      "destination": "/#contato",
+      "permanent": true
+    },
+    {
+      "source": "/orcamento/",
+      "destination": "/#contato",
+      "permanent": true
+    },
+    {
+      "source": "/localizacao",
+      "destination": "/#localizacao",
+      "permanent": true
+    },
+    {
+      "source": "/localizacao/",
+      "destination": "/#localizacao",
+      "permanent": true
+    },
+    {
+      "source": "/nossa-localizacao",
+      "destination": "/#localizacao",
+      "permanent": true
+    },
+    {
+      "source": "/nossa-localizacao/",
+      "destination": "/#localizacao",
       "permanent": true
     }
   ],

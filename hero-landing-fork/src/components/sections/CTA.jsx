@@ -1,6 +1,7 @@
-import { ArrowRight, Phone, MessageSquare } from 'lucide-react';
+import { ArrowRight, Phone } from 'lucide-react';
 import { useReveal } from '../../hooks/useReveal';
 import { siteData } from '../../data/siteData';
+import WhatsAppIcon from '../ui/WhatsAppIcon';
 
 export default function CTA() {
   const revealRef = useReveal();
@@ -39,7 +40,7 @@ export default function CTA() {
                       className="cta-primary-button group relative flex w-full items-center justify-between rounded-[1.35rem] px-6 py-5 font-semibold text-white"
                     >
                       <span className="flex items-center gap-3">
-                        <MessageSquare size={20} strokeWidth={1.75} aria-hidden="true" />
+                        <WhatsAppIcon className="h-5 w-5" />
                         {cta.text}
                       </span>
                       <ArrowRight
