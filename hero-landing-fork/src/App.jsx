@@ -48,6 +48,11 @@ function LazySection({ children }) {
 function useDeepLinkScroll() {
   useEffect(() => {
     let cancelled = false
+    let userMoved = false
+    const markUserMoved = () => { userMoved = true }
+    window.addEventListener('wheel', markUserMoved, { passive: true, once: true })
+    window.addEventListener('touchmove', markUserMoved, { passive: true, once: true })
+    window.addEventListener('keydown', markUserMoved, { once: true })
 
     const scrollToHash = () => {
       const id = window.location.hash.slice(1)
@@ -58,11 +63,22 @@ function useDeepLinkScroll() {
       const look = () => {
         if (cancelled) return
         const target = document.getElementById(id)
-        if (target) {
-          target.scrollIntoView({ behavior: 'instant', block: 'start' })
-        } else if (frames++ < 300) {
-          requestAnimationFrame(look)
+        if (!target) {
+          if (frames++ < 300) requestAnimationFrame(look)
+          return
         }
+        target.scrollIntoView({ behavior: 'instant', block: 'start' })
+        // Lazy media keeps resizing the page after the first jump; nudge the
+        // scroll back until the layout settles — unless the user scrolls.
+        const start = Date.now()
+        const settle = () => {
+          if (cancelled || userMoved) return
+          if (Math.abs(target.getBoundingClientRect().top) > 2) {
+            target.scrollIntoView({ behavior: 'instant', block: 'start' })
+          }
+          if (Date.now() - start < 2500) requestAnimationFrame(settle)
+        }
+        requestAnimationFrame(settle)
       }
       look()
     }
@@ -71,6 +87,9 @@ function useDeepLinkScroll() {
     window.addEventListener('hashchange', scrollToHash)
     return () => {
       cancelled = true
+      window.removeEventListener('wheel', markUserMoved)
+      window.removeEventListener('touchmove', markUserMoved)
+      window.removeEventListener('keydown', markUserMoved)
       window.removeEventListener('hashchange', scrollToHash)
     }
   }, [])
