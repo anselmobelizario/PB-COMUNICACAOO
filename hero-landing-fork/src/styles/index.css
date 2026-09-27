@@ -67,8 +67,12 @@ html {
   /* Garante que nenhum conteúdo alargue o layout além da tela — sem isso
      qualquer estouro escondido dá zoom-out no celular e corta o menu fixed. */
   overflow-x: hidden;
-  /* Keeps the scrollbar gutter reserved while dialogs lock scrolling
-     (useScrollLock), so the page content doesn't shift sideways. */
+}
+
+/* Só durante o bloqueio de rolagem (useScrollLock): a barra desaparece e o
+   gutter reservado evita o conteúdo "pular" para a lateral. Permanente não
+   pode ser — estreitaria o site inteiro, inclusive a hero full-bleed. */
+html.pb-scroll-locked {
   scrollbar-gutter: stable;
 }
 

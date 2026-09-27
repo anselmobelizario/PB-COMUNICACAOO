@@ -9,6 +9,7 @@ function acquireLock() {
     // propagates past html{overflow-x:hidden}), so the lock must land there.
     previousOverflow = document.documentElement.style.overflow;
     document.documentElement.style.overflow = 'hidden';
+    document.documentElement.classList.add('pb-scroll-locked');
   }
   lockCount += 1;
 }
@@ -18,6 +19,7 @@ function releaseLock() {
   lockCount -= 1;
   if (lockCount === 0) {
     document.documentElement.style.overflow = previousOverflow;
+    document.documentElement.classList.remove('pb-scroll-locked');
   }
 }
 

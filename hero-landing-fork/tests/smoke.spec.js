@@ -51,9 +51,11 @@ test.describe('site institucional P&B', () => {
 
     const producaoTab = portfolio.getByRole('tab').nth(4);
     await expect(producaoTab).toContainText('10 vídeos');
-    await expect(producaoTab).toHaveAttribute('aria-controls', 'portfolio-panel-producao');
+    // Tabs only reference their panel once it exists (selected); the ARIA
+    // tabs pattern allows lazily created panels.
     await producaoTab.click();
     await expect(producaoTab).toHaveAttribute('aria-selected', 'true');
+    await expect(producaoTab).toHaveAttribute('aria-controls', 'portfolio-panel-producao');
 
     const count = portfolio.locator('.portfolio-project-count');
     await expect(count).toContainText('vídeos');
