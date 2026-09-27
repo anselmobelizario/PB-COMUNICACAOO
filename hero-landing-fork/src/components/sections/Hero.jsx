@@ -63,6 +63,7 @@ export default function Hero() {
   const { video, headline, highlight, intro, subheadline } = siteData.hero;
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- hydration-safe sync of client-only values
     setHeroVariant(getHeroVariant());
     if (getPrefersReducedMotion()) setIsPlaybackBlocked(true);
     // Respeita apenas o "Economia de dados" do aparelho; em qualquer tela o
