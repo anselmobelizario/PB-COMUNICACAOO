@@ -26,7 +26,7 @@ if (!indexHtml.includes(EMPTY_ROOT)) {
 }
 
 const appHtml = await render()
-await fs.writeFile(indexPath, indexHtml.replace(EMPTY_ROOT, `<div id="root">${appHtml}</div>`))
+await fs.writeFile(indexPath, indexHtml.replace(EMPTY_ROOT, () => `<div id="root">${appHtml}</div>`))
 
 const textLength = appHtml.replace(/<[^>]+>/g, ' ').length
 console.log(`Prerendered ${appHtml.length} chars of markup (~${textLength} chars of text) into dist/index.html`)

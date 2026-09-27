@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const publicDir = path.join(rootDir, 'public');
-const fallbackSiteUrl = 'https://pb-comunicacao.vercel.app/';
+const fallbackSiteUrl = 'https://pbcomunicacao.com.br/';
 
 function normalizeSiteUrl(value = fallbackSiteUrl) {
   const candidate = value.trim() || fallbackSiteUrl;

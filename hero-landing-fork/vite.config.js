@@ -6,7 +6,9 @@ import path from 'node:path'
 import { siteData } from './src/data/siteData.js'
 import assetVersions from './src/data/assetVersions.json'
 
-const fallbackSiteUrl = 'https://pb-comunicacao.vercel.app/'
+// Local builds have no VITE_SITE_URL; the custom domain is live, so falling
+// back to the old *.vercel.app host would canonicalize to a 301.
+const fallbackSiteUrl = 'https://pbcomunicacao.com.br/'
 
 function normalizeSiteUrl(value = fallbackSiteUrl) {
   const candidate = value?.trim() || fallbackSiteUrl
@@ -19,11 +21,8 @@ function normalizeSiteUrl(value = fallbackSiteUrl) {
 }
 
 function resolveSiteUrl(env) {
-  // VITE_SITE_URL is pinned in the Vercel project for every environment.
-  // VERCEL_PROJECT_PRODUCTION_URL is the shortest production custom domain, so
-  // letting it leak into canonical/og:url/sitemap would point them at
-  // pbcomunicacao.com.br before its DNS leaves the old WordPress host. Flip the
-  // env value (not this file) once the domain is live.
+  // VITE_SITE_URL is pinned in the Vercel project for every environment and is
+  // the only thing that can move canonical/og:url/sitemap.
   return normalizeSiteUrl(env.VITE_SITE_URL || fallbackSiteUrl)
 }
 

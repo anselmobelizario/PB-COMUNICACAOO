@@ -40,7 +40,7 @@ export async function buildAssetManifest() {
 
   for (const file of await collectFiles(assetsDir)) {
     const publicSrc = `/assets/${path.relative(assetsDir, file).split(path.sep).join('/')}`;
-    if (galleryManifest[publicSrc]) continue;
+    if (galleryManifest[publicSrc] || publicSrc.endsWith('.avif')) continue;
 
     const hash = createHash('sha1');
     hash.update(await fs.readFile(file));
