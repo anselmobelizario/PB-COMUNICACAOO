@@ -1,5 +1,33 @@
 {
+  "redirects": [
+    { "source": "/importancia-da-comunicacao-visual", "regex": "^/importancia-da-comunicacao-visual/?$", "destination": "/#sobre", "permanent": true },
+    { "source": "/adesivagem-automotiva-para-frotas", "regex": "^/adesivagem-automotiva-para-frotas/?$", "destination": "/#portfolio", "permanent": true },
+    { "source": "/paineis-de-lona-e-ps", "regex": "^/paineis-de-lona-e-ps/?$", "destination": "/#servicos", "permanent": true },
+    { "source": "/comunicacao-visual-com-banners-e-faixas", "regex": "^/comunicacao-visual-com-banners-e-faixas/?$", "destination": "/#servicos", "permanent": true },
+    { "source": "/projeto-de-comunicacao-visual", "regex": "^/projeto-de-comunicacao-visual/?$", "destination": "/#servicos", "permanent": true },
+    { "source": "/1004-2", "regex": "^/1004-2/?$", "destination": "/", "permanent": true },
+    { "source": "/blog", "regex": "^/blog/?$", "destination": "/", "permanent": true },
+    { "source": "/home-2", "regex": "^/home-2/?$", "destination": "/", "permanent": true },
+    { "source": "/home", "regex": "^/home/?$", "destination": "/", "permanent": true },
+    { "source": "/banners", "regex": "^/banners/?$", "destination": "/#servicos", "permanent": true },
+    { "source": "/pdvs-e-materiais-diversos", "regex": "^/pdvs-e-materiais-diversos/?$", "destination": "/#portfolio", "permanent": true },
+    { "source": "/paineis", "regex": "^/paineis/?$", "destination": "/#servicos", "permanent": true },
+    { "source": "/adesivacaode-veiculos", "regex": "^/adesivacaode-veiculos/?$", "destination": "/#portfolio", "permanent": true },
+    { "source": "/adesivos", "regex": "^/adesivos/?$", "destination": "/#servicos", "permanent": true },
+    { "source": "/category-blog", "regex": "^/category/(blog|comunicacao-visual)/?$", "destination": "/", "permanent": true },
+    { "source": "/category-fabricacao-totens", "regex": "^/category/fabricacao-totens/?$", "destination": "/#servicos", "permanent": true }
+  ],
   "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=()" },
+        { "key": "Content-Security-Policy-Report-Only", "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; font-src 'self'; frame-src https://www.google.com; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests" }
+      ]
+    },
     {
       "source": "/assets/(.*)",
       "headers": [

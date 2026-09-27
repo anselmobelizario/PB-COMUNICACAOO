@@ -78,7 +78,7 @@ export const siteData = {
   social: [
     {
       platform: 'Facebook',
-      href: 'https://www.facebook.com/PBComunicacao/?locale=pt_BR',
+      href: 'https://www.facebook.com/PBComunicacao/',
       icon: 'facebook',
     },
     {

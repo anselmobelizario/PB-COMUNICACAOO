@@ -47,6 +47,22 @@ function buildJsonLd(siteUrl) {
         foundingDate: String(company.founded),
         email: contact.email,
         telephone: '+551138360196',
+        contactPoint: [
+          {
+            '@type': 'ContactPoint',
+            telephone: '+551138360196',
+            contactType: 'sales',
+            areaServed: 'BR',
+            availableLanguage: 'Portuguese',
+          },
+          {
+            '@type': 'ContactPoint',
+            telephone: '+551136448907',
+            contactType: 'customer service',
+            areaServed: 'BR',
+            availableLanguage: 'Portuguese',
+          },
+        ],
         priceRange: '$$',
         areaServed: { '@type': 'Country', name: 'Brasil' },
         hasMap: contact.location.googleMapsUrl,

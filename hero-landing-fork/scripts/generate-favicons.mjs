@@ -51,6 +51,31 @@ console.log(`generated ${path.relative(rootDir, svgPath)}`);
 const png32 = await writePng(32, 'favicon-32x32.png');
 await writePng(16, 'favicon-16x16.png');
 await writePng(180, 'apple-touch-icon.png');
+await writePng(192, 'icon-192x192.png');
+await writePng(512, 'icon-512x512.png');
+
+// Maskable icons get cropped to a circle/squircle by Android, so the logo
+// shrinks into the 80% safe zone on a solid white tile instead of filling
+// the canvas edge to edge.
+async function writeMaskablePng(size, fileName) {
+  const inner = Math.round(size * 0.8);
+  const pad = Math.round((size - inner) / 2);
+  const outputPath = path.join(publicDir, fileName);
+  await sharp(trimmedLogo)
+    .resize(inner, inner, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    .extend({
+      top: pad,
+      bottom: pad,
+      left: pad,
+      right: pad,
+      background: { r: 255, g: 255, b: 255, alpha: 1 },
+    })
+    .png()
+    .toFile(outputPath);
+  console.log(`generated ${path.relative(rootDir, outputPath)}`);
+}
+
+await writeMaskablePng(512, 'icon-maskable-512x512.png');
 
 const icoPath = path.join(publicDir, 'favicon.ico');
 await fs.writeFile(icoPath, wrapPngAsIco(png32));
