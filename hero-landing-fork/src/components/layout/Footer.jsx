@@ -58,7 +58,11 @@ export default function Footer() {
                 <li className="flex items-center gap-2">
                   <Phone size={16} strokeWidth={1.5} className="flex-shrink-0" aria-hidden="true" />
                   <a href={siteData.contact.phoneLink} className="whitespace-nowrap hover:text-[var(--color-pb-ink)]">
-                    {siteData.contact.phones}
+                    (11) 3836-0196
+                  </a>
+                  <span aria-hidden="true">/</span>
+                  <a href={siteData.contact.phoneLink2} className="whitespace-nowrap hover:text-[var(--color-pb-ink)]">
+                    {siteData.contact.phone2}
                   </a>
                 </li>
                 <li className="flex items-center gap-2">

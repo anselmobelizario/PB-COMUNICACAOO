@@ -23,6 +23,19 @@ export default function Navbar() {
   useScrollLock(menuOpen);
 
   useEffect(() => {
+    // The drawer lives inside the app root, so the background is inerted per
+    // element (nav, content, footer) instead of inerting the root itself.
+    if (!menuOpen) return undefined;
+    const background = [
+      document.querySelector('nav.site-navbar'),
+      document.getElementById('content'),
+      document.querySelector('footer'),
+    ].filter(Boolean);
+    background.forEach((el) => el.setAttribute('inert', ''));
+    return () => background.forEach((el) => el.removeAttribute('inert'));
+  }, [menuOpen]);
+
+  useEffect(() => {
     if (!menuOpen || !drawerRef.current) return undefined;
 
     const drawer = drawerRef.current;
@@ -85,7 +98,7 @@ export default function Navbar() {
               type="button"
               className="flex h-11 w-11 items-center justify-center rounded-lg text-[var(--color-pb-ink-2)] transition-colors hover:text-[var(--color-pb-ink)]"
               aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
-              aria-controls="mobile-navigation-drawer"
+              aria-controls={menuOpen ? 'mobile-navigation-drawer' : undefined}
               aria-expanded={menuOpen}
               onClick={() => setMenuOpen((previous) => !previous)}
             >
@@ -177,13 +190,22 @@ export default function Navbar() {
                 <WhatsAppIcon className="h-[19px] w-[19px]" />
                 Solicite seu Orçamento
               </a>
-              <a
-                href={siteData.contact.phoneLink}
-                className="mt-3 flex items-center justify-center gap-2 text-[0.8rem] font-medium text-[var(--color-pb-ink-2)] transition-colors hover:text-[var(--color-pb-ink)]"
-              >
+              <div className="mt-3 flex items-center justify-center gap-2 text-[0.8rem] font-medium text-[var(--color-pb-ink-2)]">
                 <Phone size={14} strokeWidth={1.75} aria-hidden="true" />
-                {siteData.contact.phones}
-              </a>
+                <a
+                  href={siteData.contact.phoneLink}
+                  className="transition-colors hover:text-[var(--color-pb-ink)]"
+                >
+                  (11) 3836-0196
+                </a>
+                <span aria-hidden="true">/</span>
+                <a
+                  href={siteData.contact.phoneLink2}
+                  className="transition-colors hover:text-[var(--color-pb-ink)]"
+                >
+                  {siteData.contact.phone2}
+                </a>
+              </div>
             </div>
           </div>
         </>

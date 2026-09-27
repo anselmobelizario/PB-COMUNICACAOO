@@ -90,7 +90,7 @@ function MaterialsVideoCarousel({ videos }) {
   };
 
   return (
-    <figure
+    <div
       ref={figureRef}
       className="materials-video"
       role="region"
@@ -163,7 +163,7 @@ function MaterialsVideoCarousel({ videos }) {
         })}
       </div>
 
-      <figcaption className="materials-video-caption">
+      <div className="materials-video-caption">
         <div className="materials-video-controls" role="group" aria-label="Controles do carrossel de materiais">
           {videoCount > 1 && (
             <button
@@ -206,7 +206,7 @@ function MaterialsVideoCarousel({ videos }) {
             </button>
           )}
         </div>
-      </figcaption>
+      </div>
 
       {videoCount > 1 && (
         <div className="materials-video-progress">
@@ -227,7 +227,7 @@ function MaterialsVideoCarousel({ videos }) {
           </span>
         </div>
       )}
-    </figure>
+    </div>
   );
 }
 

@@ -54,6 +54,7 @@ function buildWhatsAppUrl(form) {
 
 export default function ContactForm() {
   const revealRef = useReveal();
+  const formRef = useRef(null);
   const lgpdNoteId = useId();
   const consentId = useId();
   const [form, setForm] = useState(INITIAL_STATE);
@@ -66,6 +67,12 @@ export default function ContactForm() {
       if (statusTimerRef.current) clearTimeout(statusTimerRef.current);
     };
   }, []);
+
+  useEffect(() => {
+    // The invalid markers only exist after this render commits.
+    if (status !== 'invalid') return;
+    formRef.current?.querySelector('[aria-invalid="true"]')?.focus();
+  }, [status]);
 
   const scheduleStatusReset = () => {
     if (statusTimerRef.current) clearTimeout(statusTimerRef.current);
@@ -185,6 +192,7 @@ export default function ContactForm() {
           </div>
 
           <form
+            ref={formRef}
             noValidate
             className="contact-form"
             onSubmit={handleSubmit}
@@ -218,7 +226,7 @@ export default function ContactForm() {
               value={form.contact}
               onChange={updateField('contact')}
               autoComplete="email"
-              inputMode="email"
+              inputMode="text"
               maxLength={FIELD_LIMITS.contact}
               error={showErrors ? validationErrors.contact : null}
             />

@@ -18,6 +18,14 @@ function Lightbox({ items, index, onClose, onPrev, onNext, onJump }) {
   useScrollLock(true);
 
   useEffect(() => {
+    // The dialog renders in a body portal; inerting the app root takes the
+    // whole page behind it out of the tab order and off the pointer.
+    const root = document.getElementById('root');
+    root?.setAttribute('inert', '');
+    return () => root?.removeAttribute('inert');
+  }, []);
+
+  useEffect(() => {
     previousFocusRef.current = document.activeElement;
     closeRef.current?.focus();
 
@@ -172,6 +180,7 @@ export default function Portfolio() {
   const [lightboxIndex, setLightboxIndex] = useState(null);
   const [isPending, startTransition] = useTransition();
   const panelRef = useRef(null);
+  const tabsRef = useRef(null);
   useFlushColumns(panelRef, activeCategory);
 
   const activeCategoryMeta = portfolio.categories.find(
@@ -234,6 +243,37 @@ export default function Portfolio() {
     startTransition(() => setActiveCategory(categoryId));
   };
 
+  // ARIA tabs pattern: arrows move selection with a roving tabindex, so the
+  // five tabs stop flooding the Tab order.
+  const handleTablistKeyDown = (event) => {
+    const ids = portfolio.categories.map((category) => category.id);
+    const current = ids.indexOf(activeCategory);
+    let nextId;
+    switch (event.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        nextId = ids[(current + 1) % ids.length];
+        break;
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        nextId = ids[(current - 1 + ids.length) % ids.length];
+        break;
+      case 'Home':
+        nextId = ids[0];
+        break;
+      case 'End':
+        nextId = ids[ids.length - 1];
+        break;
+      default:
+        return;
+    }
+    event.preventDefault();
+    selectCategory(nextId);
+    requestAnimationFrame(() => {
+      tabsRef.current?.querySelector(`#portfolio-tab-${CSS.escape(nextId)}`)?.focus();
+    });
+  };
+
   const lightboxItemCount = photoTiles.length;
   const isVideoOnly = Boolean(activeCategoryMeta?.videoOnly);
   const hasProductionVideos = portfolio.videos.length > 0;
@@ -276,27 +316,38 @@ export default function Portfolio() {
             <p>{portfolio.subheadline}</p>
           </div>
           <div className="portfolio-project-count" aria-live="polite">
+            <span className="sr-only">
+              {isVideoOnly
+                ? `${videoCount} ${videoCount === 1 ? 'vídeo' : 'vídeos'} em ${activeCategoryLabel}`
+                : `${filteredProjects.length} ${filteredProjects.length === 1 ? 'projeto' : 'projetos'}, ${categoryImages} ${categoryImages === 1 ? 'foto' : 'fotos'} em ${activeCategoryLabel}`}
+            </span>
             {isVideoOnly ? (
               <>
-                <strong>{videoCount}</strong>
-                <span>{videoCount === 1 ? 'vídeo' : 'vídeos'}</span>
+                <strong aria-hidden="true">{videoCount}</strong>
+                <span aria-hidden="true">{videoCount === 1 ? 'vídeo' : 'vídeos'}</span>
               </>
             ) : (
               <>
-                <strong>{filteredProjects.length}</strong>
-                <span>{filteredProjects.length === 1 ? 'projeto' : 'projetos'}</span>
+                <strong aria-hidden="true">{filteredProjects.length}</strong>
+                <span aria-hidden="true">{filteredProjects.length === 1 ? 'projeto' : 'projetos'}</span>
                 <span className="portfolio-project-count-divider" aria-hidden="true">·</span>
-                <strong>{categoryImages}</strong>
-                <span>{categoryImages === 1 ? 'foto' : 'fotos'}</span>
+                <strong aria-hidden="true">{categoryImages}</strong>
+                <span aria-hidden="true">{categoryImages === 1 ? 'foto' : 'fotos'}</span>
               </>
             )}
-            <span className="portfolio-project-count-note">
+            <span className="portfolio-project-count-note" aria-hidden="true">
               em {activeCategoryLabel}
             </span>
           </div>
         </div>
 
-        <div className="portfolio-tabs" role="tablist" aria-label="Categorias do portfólio">
+        <div
+          ref={tabsRef}
+          className="portfolio-tabs"
+          role="tablist"
+          aria-label="Categorias do portfólio"
+          onKeyDown={handleTablistKeyDown}
+        >
           {portfolio.categories.map((category) => {
             const isActive = category.id === activeCategory;
             const { projectCount = 0, imageCount = 0 } = categoryStats.get(category.id) ?? {};
@@ -308,7 +359,8 @@ export default function Portfolio() {
                 role="tab"
                 id={`portfolio-tab-${category.id}`}
                 aria-selected={isActive}
-                aria-controls={`portfolio-panel-${category.id}`}
+                aria-controls={isActive ? `portfolio-panel-${category.id}` : undefined}
+                tabIndex={isActive ? 0 : -1}
                 className={isActive ? 'is-active' : ''}
                 onClick={() => selectCategory(category.id)}
               >

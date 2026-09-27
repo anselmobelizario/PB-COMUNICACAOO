@@ -48,10 +48,12 @@ function FlagWaveMark({ children }) {
 export default function Hero() {
   const sectionRef = useRef(null);
   const videoRef = useRef(null);
+  const userPausedRef = useRef(false);
   const heroVariant = getHeroVariant();
 
   const [isReady, setIsReady] = useState(false);
   const [isPlaybackBlocked, setIsPlaybackBlocked] = useState(getPrefersReducedMotion);
+  const [isUserPaused, setIsUserPaused] = useState(false);
   const [shouldAutoplay] = useState(() => !getPrefersReducedMotion());
   const [isVideoEnabled, setIsVideoEnabled] = useState(() => {
     if (typeof window === 'undefined') return true;
@@ -85,7 +87,8 @@ export default function Hero() {
     };
 
     const playVideo = async () => {
-      if (!isVisible || document.hidden) return false;
+      // An explicit keyboard pause wins over every auto-recovery path.
+      if (userPausedRef.current || !isVisible || document.hidden) return false;
 
       media.muted = true;
       media.defaultMuted = true;
@@ -216,6 +219,8 @@ export default function Hero() {
     media.muted = true;
     media.defaultMuted = true;
     media.playsInline = true;
+    userPausedRef.current = false;
+    setIsUserPaused(false);
 
     try {
       await media.play();
@@ -226,6 +231,25 @@ export default function Hero() {
     }
   };
 
+  const toggleHeroPlayback = () => {
+    const media = videoRef.current;
+    if (!media) return;
+
+    if (media.paused) {
+      userPausedRef.current = false;
+      setIsUserPaused(false);
+      media.muted = true;
+      media.defaultMuted = true;
+      media.playsInline = true;
+      media.play()?.catch?.(() => {});
+      return;
+    }
+
+    userPausedRef.current = true;
+    setIsUserPaused(true);
+    media.pause();
+  };
+
   return (
     <section
       ref={sectionRef}
@@ -233,6 +257,16 @@ export default function Hero() {
       data-hero-variant={heroVariant}
     >
       <div className="hero-shell">
+        {isVideoEnabled && !isPlaybackBlocked && (
+          <button
+            type="button"
+            className="hero-video-toggle"
+            onClick={toggleHeroPlayback}
+          >
+            {isUserPaused ? 'Reproduzir vídeo' : 'Pausar vídeo'}
+          </button>
+        )}
+
         <div className="hero-media-frame">
           <div className="hero-media-visual" aria-hidden="true">
             <img

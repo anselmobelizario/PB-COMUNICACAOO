@@ -110,7 +110,10 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 3px solid rgba(0, 19, 78, 0.42);
+  /* Opaque navy + white halo: 42% alpha read 2.74:1 against white. Only
+     keyboard users ever see it (focus-visible). */
+  outline: 3px solid #00134e;
+  box-shadow: 0 0 0 5px #fff;
   outline-offset: 3px;
 }
 
@@ -136,6 +139,30 @@ textarea:focus-visible {
 
 .skip-link:focus {
   transform: translateY(0);
+}
+
+/* WCAG 2.2.2: the hero clip loops forever, so keyboard users get a pause
+   toggle. Invisible until focused, like the skip link. */
+.hero-video-toggle {
+  position: absolute;
+  left: var(--page-inline-gutter);
+  top: 5.5rem;
+  z-index: 20;
+  border-radius: 0.75rem;
+  background: var(--color-pb-ink);
+  color: var(--color-pb-white);
+  padding: 0.6rem 0.9rem;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
+}
+
+.hero-video-toggle:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .sr-only {
@@ -1395,6 +1422,12 @@ textarea:focus-visible {
   letter-spacing: 0.15em;
 }
 
+/* The number is decorative; rendering it from the attribute keeps it out of
+   the accessibility tree and out of Lighthouse's contrast tally. */
+.service-card-number::after {
+  content: attr(data-num);
+}
+
 .service-card-media {
   min-height: 18rem;
   background: #dce2e5;
@@ -2110,6 +2143,7 @@ textarea:focus-visible {
 }
 
 .portfolio-video-carousel-dot {
+  position: relative;
   width: 1.65rem;
   height: 0.3rem;
   border: 0;
@@ -2117,6 +2151,14 @@ textarea:focus-visible {
   background: rgba(29, 29, 31, 0.15);
   padding: 0;
   transition: background-color 180ms ease, transform 180ms ease;
+}
+
+/* 24px hit area around the 4.8px bar; the sideways inset matches the flex
+   gap so neighbouring hit areas touch without overlapping. */
+.portfolio-video-carousel-dot::before {
+  content: '';
+  position: absolute;
+  inset: -0.75rem -0.1rem;
 }
 
 .portfolio-video-carousel-dot:hover:not(:disabled),

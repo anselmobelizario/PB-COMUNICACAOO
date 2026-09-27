@@ -129,9 +129,7 @@ function ServiceCard({ service, index, ctaText }) {
         className="service-card group relative flex flex-col overflow-hidden rounded-2xl transition-all duration-500 md:flex-row"
         aria-label={`Ver portfólio: ${service.title}`}
       >
-        <span aria-hidden="true" className="service-card-number">
-          {num}
-        </span>
+        <span aria-hidden="true" className="service-card-number" data-num={num} />
 
         <div className="service-card-media relative flex-shrink-0 overflow-hidden md:w-[55%]">
           {gallery.map((item, galleryIndex) => (

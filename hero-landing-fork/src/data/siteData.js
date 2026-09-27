@@ -61,6 +61,8 @@ export const siteData = {
     addressHint: 'Próximo à estação de Trem Lapa, travessa com a 12 de Outubro',
     phones: '(11) 3836-0196 / 3644-8907',
     phoneLink: 'tel:+551138360196',
+    phone2: '3644-8907',
+    phoneLink2: 'tel:+551136448907',
     email: 'vendas1@pbcomunicacao.com.br',
     whatsappPhone: WHATSAPP_PHONE,
     whatsappUrl: buildWhatsAppUrl(),
