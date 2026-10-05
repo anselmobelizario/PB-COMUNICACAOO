@@ -771,6 +771,16 @@ textarea:focus-visible {
   opacity: 0;
 }
 
+/* The wide film parks its sharp clip against the right edge, so centring the
+   crop is what sliced it off on 16:10 and 4:3 windows. Anchoring right spends
+   the crop on the blurred fill instead, which is also where the copy sits. */
+@media (min-aspect-ratio: 1/1) {
+  .hero-overlay .hero-poster,
+  .hero-overlay .hero-video {
+    object-position: 100% center;
+  }
+}
+
 .hero-video-unblock {
   position: absolute;
   right: 1rem;
@@ -2547,13 +2557,6 @@ textarea:focus-visible {
 
   .hero-media-frame {
     border-radius: 1.25rem;
-  }
-
-  /* The upright clip fills the phone. The 16:9 poster stays up until it
-     loads, so crop that poster onto the sharp clip, which begins to the
-     right of the headline. */
-  .hero-overlay .hero-poster {
-    object-position: 88% center;
   }
 
   .portfolio-header,

@@ -114,6 +114,7 @@ function buildJsonLd(siteUrl) {
 // immutable. og-image and the JSON-LD logo stay unversioned on purpose —
 // canonical meta URLs should not change when an image is re-encoded.
 const versionedHtmlPaths = [
+  '/assets/hero/hero-video-02-poster-portrait-480.webp',
   '/assets/hero/hero-video-02-poster-640.webp',
   '/assets/hero/hero-video-02-poster-960.webp',
   '/assets/hero/hero-video-02-poster-1280.webp',

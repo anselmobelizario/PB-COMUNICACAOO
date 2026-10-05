@@ -29,9 +29,19 @@
     <meta name="twitter:image" content="__OG_IMAGE_URL__" />
     <meta name="twitter:image:alt" content="P&B Comunicação Visual — projetos visuais corporativos" />
     <meta name="theme-color" content="#2EA729" />
+    <!-- Both queries mirror the <picture> in Hero.jsx: preloading the wide poster
+         on a phone would fetch 50 KB the page never paints. -->
     <link
       rel="preload"
       as="image"
+      media="(max-aspect-ratio: 1/1)"
+      href="/assets/hero/hero-video-02-poster-portrait-480.webp"
+      fetchpriority="high"
+    />
+    <link
+      rel="preload"
+      as="image"
+      media="(min-aspect-ratio: 1/1)"
       href="/assets/hero/hero-video-02-poster-1280.webp"
       imagesrcset="/assets/hero/hero-video-02-poster-640.webp 640w, /assets/hero/hero-video-02-poster-960.webp 960w, /assets/hero/hero-video-02-poster-1280.webp 1280w"
       imagesizes="100vw"

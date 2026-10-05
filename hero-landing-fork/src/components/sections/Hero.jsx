@@ -271,19 +271,22 @@ export default function Hero() {
 
         <div className="hero-media-frame">
           <div className="hero-media-visual" aria-hidden="true">
-            <img
-              src={assetUrl(video.poster)}
-              srcSet={assetSrcSet(video.posterSrcSet)}
-              sizes="100vw"
-              alt=""
-              className="hero-poster"
-              width={1920}
-              height={1080}
-              loading="eager"
-              fetchPriority="high"
-              decoding="async"
-              draggable="false"
-            />
+            <picture>
+              <source media={video.portraitMedia} srcSet={assetUrl(video.posterPortrait)} />
+              <img
+                src={assetUrl(video.poster)}
+                srcSet={assetSrcSet(video.posterSrcSet)}
+                sizes="100vw"
+                alt=""
+                className="hero-poster"
+                width={1920}
+                height={1080}
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
+                draggable="false"
+              />
+            </picture>
 
             {isVideoEnabled && (
               <video

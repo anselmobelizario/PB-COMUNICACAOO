@@ -82,6 +82,11 @@ const galleryImage = (folder, file, alt, objectPosition) => {
 // layout: 'grid' is an even 2x2 collage of square tiles; 'pairs' puts two photos per row.
 const project = (id, category, title, images, layout) => ({ id, category, title, images, layout });
 
+// The hero poster and the hero clip must switch on the same query, otherwise the
+// upright frame hands over to the wide one mid-fade. index.html preloads both
+// posters behind this query too.
+const HERO_PORTRAIT_QUERY = '(max-aspect-ratio: 1/1)';
+
 export const siteData = {
   company: {
     name: 'P&B Comunicação Visual',
@@ -153,10 +158,16 @@ export const siteData = {
     video: {
       poster: '/assets/hero/hero-video-02-poster-1280.webp',
       posterSrcSet: '/assets/hero/hero-video-02-poster-640.webp 640w, /assets/hero/hero-video-02-poster-960.webp 960w, /assets/hero/hero-video-02-poster-1280.webp 1280w',
+      // Same frame as the 16:9 poster, straight off the upright clip. Portrait
+      // screens would otherwise have to crop the blurred fill out of the wide
+      // poster, which meant a soft zoom until the video took over. 480w is the
+      // clip's own width — there is nothing sharper to offer.
+      posterPortrait: '/assets/hero/hero-video-02-poster-portrait-480.webp',
+      portraitMedia: HERO_PORTRAIT_QUERY,
       // The clip is shot upright: portrait screens get it as is, wider ones a 16:9
       // cut with the clip sharp on the right over a blurred fill of itself.
       sources: [
-        { src: '/assets/hero/hero-video-02-portrait.mp4', type: 'video/mp4', media: '(max-aspect-ratio: 1/1)' },
+        { src: '/assets/hero/hero-video-02-portrait.mp4', type: 'video/mp4', media: HERO_PORTRAIT_QUERY },
         { src: '/assets/hero/hero-video-02.mp4', type: 'video/mp4' },
       ],
     },
