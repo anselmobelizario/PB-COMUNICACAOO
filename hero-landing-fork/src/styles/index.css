@@ -781,6 +781,15 @@ textarea:focus-visible {
   }
 }
 
+/* A phone on its side still matches the rule above, but it plays the upright
+   clip. Recentering keeps that clip in frame instead of pinning it to the edge. */
+@media (max-aspect-ratio: 1/1), (max-width: 767px), (max-height: 500px) {
+  .hero-overlay .hero-poster,
+  .hero-overlay .hero-video {
+    object-position: center center;
+  }
+}
+
 .hero-video-unblock {
   position: absolute;
   right: 1rem;

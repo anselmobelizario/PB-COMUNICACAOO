@@ -79,10 +79,9 @@ export default function Hero() {
 
     if (!isVideoEnabled || !section || !media || getPrefersReducedMotion()) return undefined;
 
-    // The video ships with preload="none", so nothing downloads until playback
-    // is actually requested. Start from invisible and let the observer's first
-    // visible callback trigger the fetch — the poster (already high priority)
-    // keeps the network to itself until then.
+    // The poster stays up until the first frame. Playback itself is the
+    // autoplay attribute: a script-only play() is what mobile browsers reject
+    // until the visitor taps.
     let isVisible = false;
     let recoveryFrame = 0;
 
@@ -112,7 +111,10 @@ export default function Hero() {
         }
         setIsPlaybackBlocked(false);
         return true;
-      } catch {
+      } catch (error) {
+        // A pause that lands mid-play rejects with AbortError. That is not a
+        // policy block, and treating it as one is what left the play button up.
+        if (error?.name !== 'NotAllowedError') return false;
         setIsPlaybackBlocked(true);
         return false;
       }
@@ -152,8 +154,6 @@ export default function Hero() {
 
     // <source media> is only evaluated while parsing: a loaded clip that
     // outlives an orientation change must reload to pick the matching source.
-    // With preload="none" an untouched clip resolves its source at first play
-    // and needs nothing here.
     const mediaQueries = [...new Set(
       siteData.hero.video.sources.map((source) => source.media).filter(Boolean),
     )];
@@ -290,14 +290,23 @@ export default function Hero() {
 
             {isVideoEnabled && (
               <video
-                ref={videoRef}
+                ref={(node) => {
+                  videoRef.current = node;
+                  if (!node) return;
+                  // The attribute alone is not enough: several engines check the
+                  // property, and a truthy property is what lets autoplay through.
+                  node.muted = true;
+                  node.defaultMuted = true;
+                  node.playsInline = true;
+                }}
                 className={`hero-video ${isReady ? 'is-ready' : ''}`}
+                autoPlay
                 muted
                 loop
                 playsInline
                 disablePictureInPicture
                 disableRemotePlayback
-                preload="none"
+                preload="auto"
                 // No poster attr: the twin <img> behind it shows the same
                 // frame, and a video poster only turns into a (late) LCP
                 // candidate the moment the faded-out video becomes ready.

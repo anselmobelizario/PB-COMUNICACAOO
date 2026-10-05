@@ -84,8 +84,10 @@ const project = (id, category, title, images, layout) => ({ id, category, title,
 
 // The hero poster and the hero clip must switch on the same query, otherwise the
 // upright frame hands over to the wide one mid-fade. index.html preloads both
-// posters behind this query too.
-const HERO_PORTRAIT_QUERY = '(max-aspect-ratio: 1/1)';
+// posters behind this query too. A phone on its side is wider than it is tall,
+// so the aspect check alone would hand it the 16:9 film and the blurred fill
+// would show down the sides. Width and height catch that phone either way.
+const HERO_PORTRAIT_QUERY = '(max-aspect-ratio: 1/1), (max-width: 767px), (max-height: 500px)';
 
 export const siteData = {
   company: {
