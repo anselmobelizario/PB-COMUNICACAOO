@@ -79,10 +79,9 @@ export default function Hero() {
 
     if (!isVideoEnabled || !section || !media || getPrefersReducedMotion()) return undefined;
 
-    // The poster stays up until the first frame. Playback itself is the
-    // autoplay attribute: a script-only play() is what mobile browsers reject
-    // until the visitor taps.
-    let isVisible = false;
+    // The hero is the first screen, so assume it is visible. Waiting for the
+    // observer let iOS cancel autoplay on a zero-height first layout pass.
+    let isVisible = true;
     let recoveryFrame = 0;
 
     const cancelRecoveryFrame = () => {
@@ -114,7 +113,7 @@ export default function Hero() {
       } catch (error) {
         // A pause that lands mid-play rejects with AbortError. That is not a
         // policy block, and treating it as one is what left the play button up.
-        if (error?.name !== 'NotAllowedError') return false;
+        if (error?.name !== 'NotAllowedError' || media.readyState < 2) return false;
         setIsPlaybackBlocked(true);
         return false;
       }
@@ -171,6 +170,8 @@ export default function Hero() {
 
     const io = new IntersectionObserver(
       ([entry]) => {
+        if (!entry.isIntersecting && entry.boundingClientRect.height === 0) return;
+
         isVisible = entry.isIntersecting;
 
         if (isVisible) {
@@ -193,6 +194,8 @@ export default function Hero() {
     if (media.readyState >= 2) {
       handleCanPlay();
     }
+
+    queueRecovery();
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('pointerdown', handleAutoplayRecovery);
@@ -272,7 +275,9 @@ export default function Hero() {
         <div className="hero-media-frame">
           <div className="hero-media-visual" aria-hidden="true">
             <picture>
-              <source media={video.portraitMedia} srcSet={assetUrl(video.posterPortrait)} />
+              {video.portraitQueries.map((query) => (
+                <source key={query} media={query} srcSet={assetUrl(video.posterPortrait)} />
+              ))}
               <img
                 src={assetUrl(video.poster)}
                 srcSet={assetSrcSet(video.posterSrcSet)}
@@ -316,7 +321,7 @@ export default function Hero() {
               >
                 {video.sources.map((source, index) => (
                   <source
-                    key={source.src}
+                    key={source.media || source.src}
                     src={assetUrl(source.src)}
                     type={source.type}
                     media={source.media}

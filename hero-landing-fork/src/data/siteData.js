@@ -82,12 +82,15 @@ const galleryImage = (folder, file, alt, objectPosition) => {
 // layout: 'grid' is an even 2x2 collage of square tiles; 'pairs' puts two photos per row.
 const project = (id, category, title, images, layout) => ({ id, category, title, images, layout });
 
-// The hero poster and the hero clip must switch on the same query, otherwise the
-// upright frame hands over to the wide one mid-fade. index.html preloads both
-// posters behind this query too. A phone on its side is wider than it is tall,
-// so the aspect check alone would hand it the 16:9 film and the blurred fill
-// would show down the sides. Width and height catch that phone either way.
-const HERO_PORTRAIT_QUERY = '(max-aspect-ratio: 1/1), (max-width: 767px), (max-height: 500px)';
+// One query per <source>. WebKit treats a comma list on source media as
+// "does not match" and falls through to the wide film, which is the blurred
+// fill an iPhone was playing. A sideways phone is wider than it is tall, so
+// width and height are separate sources, not a single or-list.
+const HERO_PORTRAIT_QUERIES = [
+  '(max-aspect-ratio: 1/1)',
+  '(max-width: 767px)',
+  '(max-height: 500px)',
+];
 
 export const siteData = {
   company: {
@@ -165,11 +168,15 @@ export const siteData = {
       // poster, which meant a soft zoom until the video took over. 480w is the
       // clip's own width — there is nothing sharper to offer.
       posterPortrait: '/assets/hero/hero-video-02-poster-portrait-480.webp',
-      portraitMedia: HERO_PORTRAIT_QUERY,
+      portraitQueries: HERO_PORTRAIT_QUERIES,
       // The clip is shot upright: portrait screens get it as is, wider ones a 16:9
       // cut with the clip sharp on the right over a blurred fill of itself.
       sources: [
-        { src: '/assets/hero/hero-video-02-portrait.mp4', type: 'video/mp4', media: HERO_PORTRAIT_QUERY },
+        ...HERO_PORTRAIT_QUERIES.map((media) => ({
+          src: '/assets/hero/hero-video-02-portrait.mp4',
+          type: 'video/mp4',
+          media,
+        })),
         { src: '/assets/hero/hero-video-02.mp4', type: 'video/mp4' },
       ],
     },
