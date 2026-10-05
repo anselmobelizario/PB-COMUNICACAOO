@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Play } from 'lucide-react';
 import { siteData, assetUrl, assetSrcSet } from '../../data/siteData';
 import { getPrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
@@ -11,6 +11,18 @@ const FLAG_WAVE_PATHS = [
   'M0 5.2 C12 3.6 34 5.9 52 2.7 C74 0.2 88 4.9 100 3.0 L100 3.9 C86 5.5 70 1.6 50 4.1 C32 6.5 14 4.2 0 5.2 Z',
   'M0 5.2 C12 5.5 28 3.2 48 2.6 C68 2.1 86 3.2 100 4.4 L100 5.1 C84 4.1 66 3.5 44 4.1 C24 4.7 8 5.3 0 5.2 Z',
 ];
+
+function wantsPortraitHero() {
+  if (typeof window === 'undefined') return false;
+  return siteData.hero.video.portraitQueries.some((query) => window.matchMedia(query).matches);
+}
+
+function heroClipUrl() {
+  const { sources } = siteData.hero.video;
+  const portrait = wantsPortraitHero();
+  const chosen = sources.find((source) => Boolean(source.media) === portrait) || sources[sources.length - 1];
+  return assetUrl(chosen.src);
+}
 
 function getHeroVariant() {
   if (typeof window === 'undefined') return 'a';
@@ -59,6 +71,10 @@ export default function Hero() {
   const [isPlaybackBlocked, setIsPlaybackBlocked] = useState(false);
   const [isUserPaused, setIsUserPaused] = useState(false);
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
+  // Empty until the browser can be measured. The server cannot know, and
+  // <source media> is what handed iPhone the blurred widescreen film.
+  const [clipUrl, setClipUrl] = useState('');
+  const [portraitClip, setPortraitClip] = useState(false);
 
   const { video, headline, highlight, intro, subheadline } = siteData.hero;
 
@@ -73,11 +89,24 @@ export default function Hero() {
 
   const handleSourceError = () => setIsVideoEnabled(false);
 
+  useLayoutEffect(() => {
+    const apply = () => {
+      const portrait = wantsPortraitHero();
+      setPortraitClip(portrait);
+      setClipUrl(heroClipUrl());
+    };
+
+    apply();
+    const matchers = siteData.hero.video.portraitQueries.map((query) => window.matchMedia(query));
+    matchers.forEach((matcher) => matcher.addEventListener('change', apply));
+    return () => matchers.forEach((matcher) => matcher.removeEventListener('change', apply));
+  }, []);
+
   useEffect(() => {
     const section = sectionRef.current;
     const media = videoRef.current;
 
-    if (!isVideoEnabled || !section || !media || getPrefersReducedMotion()) return undefined;
+    if (!isVideoEnabled || !section || !media || !clipUrl || getPrefersReducedMotion()) return undefined;
 
     // The hero is the first screen, so assume it is visible. Waiting for the
     // observer let iOS cancel autoplay on a zero-height first layout pass.
@@ -151,23 +180,6 @@ export default function Hero() {
       setIsVideoEnabled(false);
     };
 
-    // <source media> is only evaluated while parsing: a loaded clip that
-    // outlives an orientation change must reload to pick the matching source.
-    const mediaQueries = [...new Set(
-      siteData.hero.video.sources.map((source) => source.media).filter(Boolean),
-    )];
-    const matchers = mediaQueries.map((query) => window.matchMedia(query));
-
-    const handleOrientationChange = () => {
-      if (media.readyState === 0 || !isVisible || document.hidden) return;
-      media.load();
-      if (getPrefersReducedMotion() || userPausedRef.current) return;
-      media.muted = true;
-      media.play()?.catch?.(() => {});
-    };
-
-    matchers.forEach((matcher) => matcher.addEventListener('change', handleOrientationChange));
-
     const io = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting && entry.boundingClientRect.height === 0) return;
@@ -204,7 +216,6 @@ export default function Hero() {
 
     return () => {
       io.disconnect();
-      matchers.forEach((matcher) => matcher.removeEventListener('change', handleOrientationChange));
       media.removeEventListener('loadeddata', handleCanPlay);
       media.removeEventListener('canplay', handleCanPlay);
       media.removeEventListener('playing', handleCanPlay);
@@ -215,7 +226,7 @@ export default function Hero() {
       window.removeEventListener('keydown', handleAutoplayRecovery);
       pauseVideo();
     };
-  }, [isVideoEnabled]);
+  }, [clipUrl, isVideoEnabled]);
 
   const handleManualPlayback = async () => {
     const media = videoRef.current;
@@ -274,24 +285,38 @@ export default function Hero() {
 
         <div className="hero-media-frame">
           <div className="hero-media-visual" aria-hidden="true">
-            <picture>
-              {video.portraitQueries.map((query) => (
-                <source key={query} media={query} srcSet={assetUrl(video.posterPortrait)} />
-              ))}
+            {portraitClip ? (
               <img
-                src={assetUrl(video.poster)}
-                srcSet={assetSrcSet(video.posterSrcSet)}
-                sizes="100vw"
+                src={assetUrl(video.posterPortrait)}
                 alt=""
                 className="hero-poster"
-                width={1920}
-                height={1080}
+                width={480}
+                height={768}
                 loading="eager"
                 fetchPriority="high"
                 decoding="async"
                 draggable="false"
               />
-            </picture>
+            ) : (
+              <picture>
+                {video.portraitQueries.map((query) => (
+                  <source key={query} media={query} srcSet={assetUrl(video.posterPortrait)} />
+                ))}
+                <img
+                  src={assetUrl(video.poster)}
+                  srcSet={assetSrcSet(video.posterSrcSet)}
+                  sizes="100vw"
+                  alt=""
+                  className="hero-poster"
+                  width={1920}
+                  height={1080}
+                  loading="eager"
+                  fetchPriority="high"
+                  decoding="async"
+                  draggable="false"
+                />
+              </picture>
+            )}
 
             {isVideoEnabled && (
               <video
@@ -303,6 +328,10 @@ export default function Hero() {
                   node.muted = true;
                   node.defaultMuted = true;
                   node.playsInline = true;
+                  // Assign the file here. <source media> is ignored by iOS, so the
+                  // browser would otherwise keep the blurred widescreen film.
+                  const url = heroClipUrl();
+                  if (url && node.src !== new URL(url, window.location.href).href) node.src = url;
                 }}
                 className={`hero-video ${isReady ? 'is-ready' : ''}`}
                 autoPlay
@@ -311,24 +340,16 @@ export default function Hero() {
                 playsInline
                 disablePictureInPicture
                 disableRemotePlayback
-                preload="auto"
+                preload={clipUrl ? 'auto' : 'none'}
+                src={clipUrl || undefined}
+                onError={handleSourceError}
                 // No poster attr: the twin <img> behind it shows the same
                 // frame, and a video poster only turns into a (late) LCP
                 // candidate the moment the faded-out video becomes ready.
                 width={1920}
                 height={1080}
                 tabIndex={-1}
-              >
-                {video.sources.map((source, index) => (
-                  <source
-                    key={source.media || source.src}
-                    src={assetUrl(source.src)}
-                    type={source.type}
-                    media={source.media}
-                    onError={index === video.sources.length - 1 ? handleSourceError : undefined}
-                  />
-                ))}
-              </video>
+              />
             )}
           </div>
 
