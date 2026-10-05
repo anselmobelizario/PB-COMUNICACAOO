@@ -796,11 +796,11 @@ export const siteData = {
       },
       {
         q: 'Como funciona a política de entregas?',
-        a: 'Entrega garantida para a capital acima de R$ 300,00. Para demais regiões, realizamos envio por transportadora com rastreamento. Instalações são orçadas separadamente conforme a localização.',
+        a: 'Entrega garantida para a capital acima de R$ 500,00. Para demais regiões, realizamos envio por transportadora com rastreamento. Instalações são orçadas separadamente conforme a localização.',
       },
       {
         q: 'Qual o prazo médio de produção?',
-        a: 'Varia conforme a complexidade e volume do projeto. Projetos padrão são entregues entre 5 a 15 dias úteis. Projetos de grande escala corporativa possuem cronograma dedicado com acompanhamento em tempo real.',
+        a: 'Varia conforme a complexidade e volume do projeto. Projetos de grande escala corporativa possuem cronograma dedicado com acompanhamento em tempo real.',
       },
     ],
   },
