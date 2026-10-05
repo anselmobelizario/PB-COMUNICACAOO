@@ -13,12 +13,12 @@
     },
     {
       "source": "/importancia-da-comunicacao-visual",
-      "destination": "/#sobre",
+      "destination": "/",
       "permanent": true
     },
     {
       "source": "/importancia-da-comunicacao-visual/",
-      "destination": "/#sobre",
+      "destination": "/",
       "permanent": true
     },
     {
@@ -263,52 +263,52 @@
     },
     {
       "source": "/sobre",
-      "destination": "/#sobre",
+      "destination": "/",
       "permanent": true
     },
     {
       "source": "/sobre/",
-      "destination": "/#sobre",
+      "destination": "/",
       "permanent": true
     },
     {
       "source": "/sobre-nos",
-      "destination": "/#sobre",
+      "destination": "/",
       "permanent": true
     },
     {
       "source": "/sobre-nos/",
-      "destination": "/#sobre",
+      "destination": "/",
       "permanent": true
     },
     {
       "source": "/quem-somos",
-      "destination": "/#sobre",
+      "destination": "/",
       "permanent": true
     },
     {
       "source": "/quem-somos/",
-      "destination": "/#sobre",
+      "destination": "/",
       "permanent": true
     },
     {
       "source": "/empresa",
-      "destination": "/#sobre",
+      "destination": "/",
       "permanent": true
     },
     {
       "source": "/empresa/",
-      "destination": "/#sobre",
+      "destination": "/",
       "permanent": true
     },
     {
       "source": "/midia",
-      "destination": "/#sobre",
+      "destination": "/",
       "permanent": true
     },
     {
       "source": "/midia/",
-      "destination": "/#sobre",
+      "destination": "/",
       "permanent": true
     },
     {

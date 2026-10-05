@@ -1,11 +1,10 @@
 import { useReveal } from '../../hooks/useReveal';
 import StepIcon from '../icons/StepIcon';
-import { siteData, assetUrl } from '../../data/siteData';
+import { siteData } from '../../data/siteData';
 
 export default function Process() {
   const revealRef = useReveal();
   const { process } = siteData;
-  const { logoWidth, logoHeight } = siteData.company;
 
   return (
     <section
@@ -14,7 +13,7 @@ export default function Process() {
     >
       <div ref={revealRef} className="reveal-section mx-auto max-w-7xl">
         <div className="grid gap-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-16">
-          <div className="min-w-0 lg:sticky lg:top-28 lg:self-start">
+          <div className="flex min-w-0 flex-col justify-center">
             <span className="section-kicker-light">{process.label}</span>
             <h2
               id="process-heading"
@@ -27,20 +26,9 @@ export default function Process() {
             <p className="mt-5 max-w-xl text-base leading-relaxed text-[var(--color-pb-ink-2)] sm:text-lg">
               {process.subheadline}
             </p>
-
-            <div className="process-brand-card mt-10" aria-label="A marca P&B Comunicação Visual">
-              <img
-                src={assetUrl('/assets/logo-360.webp')}
-                alt="P&B Comunicação Visual"
-                width={logoWidth}
-                height={logoHeight}
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
           </div>
 
-          <ol className="editorial-surface-light process-steps rounded-[1.75rem] px-6 sm:px-8 lg:h-full">
+          <ol className="editorial-surface-light process-steps rounded-[1.75rem] px-6 sm:px-8">
             {process.steps.map((step) => (
               <li key={step.num} className="process-step">
                 <div className="benefit-row-meta process-step-meta">

@@ -130,7 +130,6 @@ export const siteData = {
 
   nav: {
     links: [
-      { label: 'Sobre', href: '#sobre' },
       { label: 'Serviços', href: '#servicos' },
       { label: 'Portfólio', href: '#portfolio' },
       { label: 'FAQ', href: '#faq' },
@@ -181,43 +180,6 @@ export const siteData = {
       { name: 'EDP Energia', src: '/assets/clients/edp.jpg' },
       { name: 'Sonda', src: '/assets/clients/sonda.webp' },
       { name: 'Adias', src: '/assets/clients/adias.webp' },
-    ],
-  },
-
-  whyUs: {
-    label: 'Resultados',
-    headline: {
-      before: 'Por que empresas',
-      accent: 'escolhem a P&B',
-      after: '',
-    },
-    subheadline:
-      'Projetos pensados para dar presença à marca, facilitar a operação e transformar cada ponto de contato em uma experiência consistente.',
-    benefits: [
-      {
-        icon: 'eye',
-        title: 'Presença que trabalha todos os dias',
-        description:
-          'Aplicamos a identidade da sua marca em veículos, ambientes e materiais para que ela seja reconhecida em cada rota, loja e ponto de venda.',
-      },
-      {
-        icon: 'layers',
-        title: 'Padronização em qualquer escala',
-        description:
-          'Do projeto pontual à operação nacional, mantemos acabamento, cor e aplicação alinhados ao padrão visual que a sua empresa precisa.',
-      },
-      {
-        icon: 'timer',
-        title: 'Agilidade que não deixa sua marca parada',
-        description:
-          'Campanha, inauguração ou troca de frota: sua marca precisa estar visível no momento certo. Entregamos com rapidez para você não perder oportunidade.',
-      },
-    ],
-    stats: [
-      { value: '24 anos', label: 'Construindo marcas visíveis' },
-      { value: 'B2B + B2C', label: 'Um parceiro, dois mercados' },
-      { value: 'Brasil inteiro', label: 'Instalação onde sua marca for' },
-      { value: 'Ponta a ponta', label: 'Do briefing à instalação' },
     ],
   },
 
@@ -835,12 +797,6 @@ export const siteData = {
   form: {
     id: 'contato',
     kicker: 'Fale com a P&B',
-    headline: {
-      before: 'Conte seu projeto em',
-      accent: '60 segundos',
-    },
-    subheadline:
-      'Responda em menos de um minuto. Enviamos sua mensagem direto ao WhatsApp do comercial — sem cadastro, sem cookies, sem rastreamento.',
     fields: {
       name: { label: 'Nome', placeholder: 'Como devemos te chamar?', required: true },
       company: { label: 'Empresa (opcional)', placeholder: 'Nome da sua empresa' },
@@ -865,16 +821,6 @@ export const siteData = {
       'Tudo certo! Abrimos o WhatsApp com sua mensagem — confira e aperte enviar.',
     successEmail:
       'Preparamos a mensagem no seu aplicativo de e-mail. Se nada abrir, escreva direto para vendas1@pbcomunicacao.com.br.',
-    lgpd: {
-      title: 'Privacidade e LGPD',
-      bullets: [
-        'Coletamos apenas o necessário para responder: nome, contato e descrição do projeto.',
-        'Nunca pedimos CPF, RG, endereço residencial ou dados financeiros neste formulário.',
-        'Os dados não saem do seu navegador: são enviados direto ao WhatsApp/e-mail do comercial.',
-        'Você pode pedir correção ou exclusão a qualquer momento pelo e-mail do DPO.',
-      ],
-      dpoLabel: 'Encarregado de Dados (DPO):',
-    },
   },
 
   ctaBanner: {

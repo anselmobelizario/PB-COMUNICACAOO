@@ -4,7 +4,6 @@ import Hero from './components/sections/Hero'
 import TrustLogos from './components/sections/TrustLogos'
 import FloatingWhatsApp from './components/ui/FloatingWhatsApp'
 
-const Benefits = lazy(() => import('./components/sections/Benefits'))
 const Process = lazy(() => import('./components/sections/Process'))
 const MaterialsVideo = lazy(() => import('./components/sections/MaterialsVideo'))
 const Services = lazy(() => import('./components/sections/Services'))
@@ -117,7 +116,6 @@ function App() {
       <main id="content">
         <Hero />
         <TrustLogos />
-        <LazySection><Benefits /></LazySection>
         <LazySection><Process /></LazySection>
         <LazySection><MaterialsVideo /></LazySection>
         <LazySection><Services /></LazySection>

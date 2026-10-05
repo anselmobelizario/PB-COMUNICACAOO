@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import { ArrowRight, Mail, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Mail } from 'lucide-react';
 import { useReveal } from '../../hooks/useReveal';
 import WhatsAppIcon from '../ui/WhatsAppIcon';
 import { siteData } from '../../data/siteData';
@@ -55,7 +55,6 @@ function buildWhatsAppUrl(form) {
 export default function ContactForm() {
   const revealRef = useReveal();
   const formRef = useRef(null);
-  const lgpdNoteId = useId();
   const consentId = useId();
   const [form, setForm] = useState(INITIAL_STATE);
   const [status, setStatus] = useState('idle');
@@ -148,56 +147,17 @@ export default function ContactForm() {
       aria-labelledby="contato-heading"
       className="relative z-10 bg-[var(--color-pb-white)] px-6 py-6"
     >
-      <div ref={revealRef} className="reveal-section @container mx-auto max-w-7xl">
-        {/* Two columns only once the form column fits its side-by-side rows (see .contact-form-row);
-            narrower than that it stacks instead of squeezing the form. */}
-        <div className="grid gap-12 @min-[70rem]:grid-cols-[minmax(0,0.46fr)_minmax(0,0.54fr)] @min-[70rem]:items-stretch @min-[70rem]:gap-16">
-          <div className="flex flex-col">
-            <span className="section-kicker-light">{copy.kicker}</span>
-            <h2 id="contato-heading" className="mt-6 font-[var(--font-display)] text-3xl font-bold leading-[1.08] tracking-tight text-[var(--color-pb-accent-blue)] sm:text-4xl md:text-5xl">
-              {copy.headline.before} {copy.headline.accent}
-            </h2>
-            <p className="mt-6 mb-10 max-w-xl text-base leading-relaxed text-[var(--color-pb-ink-2)] sm:text-lg">
-              {copy.subheadline}
-            </p>
+      <div ref={revealRef} className="reveal-section mx-auto w-full max-w-[43rem]">
+        <h2 id="contato-heading" className="section-kicker-light m-0">
+          {copy.kicker}
+        </h2>
 
-            <div id={lgpdNoteId} className="lgpd-note mt-auto">
-              <div className="flex items-center gap-2 text-[var(--color-pb-ink)]">
-                <ShieldCheck size={18} strokeWidth={1.75} aria-hidden="true" />
-                <span className="font-[var(--font-display)] text-sm font-semibold">
-                  {copy.lgpd.title}
-                </span>
-              </div>
-              <ul className="mt-4 space-y-2 text-sm leading-relaxed text-[var(--color-pb-ink-2)]">
-                {copy.lgpd.bullets.map((item) => (
-                  <li key={item} className="flex gap-2">
-                    <span
-                      aria-hidden="true"
-                      className="mt-[9px] h-[4px] w-[4px] flex-shrink-0 rounded-full bg-[var(--color-pb-accent-on-light)]"
-                    />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-4 text-xs text-[var(--color-pb-ink-2)]">
-                {copy.lgpd.dpoLabel}{' '}
-                <a
-                  href={`mailto:${siteData.contact.email}`}
-                  className="text-[var(--color-pb-accent-on-light)] hover:underline"
-                >
-                  {siteData.contact.email}
-                </a>
-              </p>
-            </div>
-          </div>
-
-          <form
-            ref={formRef}
-            noValidate
-            className="contact-form"
-            onSubmit={handleSubmit}
-            aria-describedby={lgpdNoteId}
-          >
+        <form
+          ref={formRef}
+          noValidate
+          className="contact-form mt-8"
+          onSubmit={handleSubmit}
+        >
             <div className="contact-form-row">
               <Field
                 label={copy.fields.name.label}
@@ -285,8 +245,7 @@ export default function ContactForm() {
             </div>
 
             <StatusMessage status={status} copy={copy} />
-          </form>
-        </div>
+        </form>
       </div>
     </section>
   );
