@@ -13,8 +13,7 @@ const FLAG_WAVE_PATHS = [
 ];
 
 function wantsPortraitHero() {
-  if (typeof window === 'undefined') return false;
-  return siteData.hero.video.portraitQueries.some((query) => window.matchMedia(query).matches);
+  return true;
 }
 
 function heroClipUrl() {
@@ -346,8 +345,8 @@ export default function Hero() {
                 // No poster attr: the twin <img> behind it shows the same
                 // frame, and a video poster only turns into a (late) LCP
                 // candidate the moment the faded-out video becomes ready.
-                width={1920}
-                height={1080}
+                width={480}
+                height={768}
                 tabIndex={-1}
               />
             )}

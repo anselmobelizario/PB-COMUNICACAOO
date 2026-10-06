@@ -659,10 +659,10 @@ textarea:focus-visible {
   z-index: 2;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: center;
   grid-column: 1;
-  width: 100%;
-  max-width: min(52rem, 78vw);
+  width: min(42rem, 48vw);
+  max-width: min(42rem, 48vw);
   min-height: 100vh; /* fallback p/ browsers sem svh */
   min-height: 100svh;
   /* Starts on the page column. A margin rather than padding on .hero-shell: the video
@@ -674,6 +674,15 @@ textarea:focus-visible {
     var(--page-inline-gutter)
     clamp(2rem, 6vh, 3.5rem);
   container-type: inline-size;
+}
+
+@media (max-width: 767px), (max-aspect-ratio: 1/1) {
+  .hero-overlay .hero-copy {
+    width: 100%;
+    max-width: none;
+    justify-content: flex-end;
+    padding-bottom: clamp(4.5rem, 12vh, 7.5rem);
+  }
 }
 
 .hero-overlay .hero-title {
@@ -771,23 +780,9 @@ textarea:focus-visible {
   opacity: 0;
 }
 
-/* The wide film parks its sharp clip against the right edge, so centring the
-   crop is what sliced it off on 16:10 and 4:3 windows. Anchoring right spends
-   the crop on the blurred fill instead, which is also where the copy sits. */
-@media (min-aspect-ratio: 1/1) {
-  .hero-overlay .hero-poster,
-  .hero-overlay .hero-video {
-    object-position: 100% center;
-  }
-}
-
-/* A phone on its side still matches the rule above, but it plays the upright
-   clip. Recentering keeps that clip in frame instead of pinning it to the edge. */
-@media (max-aspect-ratio: 1/1), (max-width: 767px), (max-height: 500px) {
-  .hero-overlay .hero-poster,
-  .hero-overlay .hero-video {
-    object-position: center center;
-  }
+.hero-overlay .hero-poster,
+.hero-overlay .hero-video {
+  object-position: center 40%;
 }
 
 .hero-video-unblock {
