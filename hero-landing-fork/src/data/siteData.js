@@ -827,7 +827,7 @@ export const siteData = {
       },
       message: {
         label: 'Conte sobre seu projeto',
-        placeholder: 'Ex.: adesivação de 20 veículos, fachada em ACM, sinalização interna…',
+        placeholder: 'Ex.: adesivação de 20 veículos, sinalização interna…',
         required: true,
       },
     },
