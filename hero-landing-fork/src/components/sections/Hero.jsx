@@ -1,7 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Play } from 'lucide-react';
 import { siteData, assetUrl, assetSrcSet } from '../../data/siteData';
-import { getPrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 
 const HERO_VARIANTS = new Set(['a', 'b', 'c']);
 const FLAG_WAVE_PATHS = [
@@ -21,6 +19,18 @@ function heroClipUrl() {
   const portrait = wantsPortraitHero();
   const chosen = sources.find((source) => Boolean(source.media) === portrait) || sources[sources.length - 1];
   return assetUrl(chosen.src);
+}
+
+function armHeroPlayback(media) {
+  media.muted = true;
+  media.defaultMuted = true;
+  media.volume = 0;
+  media.playsInline = true;
+  media.setAttribute('muted', '');
+  media.setAttribute('autoplay', '');
+  media.setAttribute('playsinline', '');
+  media.setAttribute('webkit-playsinline', '');
+  media.setAttribute('loop', '');
 }
 
 function getHeroVariant() {
@@ -65,25 +75,19 @@ export default function Hero() {
   const [heroVariant, setHeroVariant] = useState('a');
 
   const [isReady, setIsReady] = useState(false);
-  // Values that depend on browser APIs start at the server-rendered default
-  // and sync in an effect, so hydration never sees a mismatch.
-  const [isPlaybackBlocked, setIsPlaybackBlocked] = useState(false);
   const [isUserPaused, setIsUserPaused] = useState(false);
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
-  // Empty until the browser can be measured. The server cannot know, and
-  // <source media> is what handed iPhone the blurred widescreen film.
-  const [clipUrl, setClipUrl] = useState('');
-  const [portraitClip, setPortraitClip] = useState(false);
+  // Portrait clip is the only hero file now, so the prerendered HTML can
+  // already carry src+muted+autoplay. Waiting until hydration was what made
+  // Safari treat playback as a post-load play() and demand a tap.
+  const [clipUrl, setClipUrl] = useState(heroClipUrl);
+  const [portraitClip, setPortraitClip] = useState(true);
 
   const { video, headline, highlight, intro, subheadline } = siteData.hero;
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- hydration-safe sync of client-only values
     setHeroVariant(getHeroVariant());
-    if (getPrefersReducedMotion()) setIsPlaybackBlocked(true);
-    // Respeita apenas o "Economia de dados" do aparelho; em qualquer tela o
-    // vídeo toca.
-    if (navigator.connection?.saveData === true) setIsVideoEnabled(false);
   }, []);
 
   const handleSourceError = () => setIsVideoEnabled(false);
@@ -105,67 +109,43 @@ export default function Hero() {
     const section = sectionRef.current;
     const media = videoRef.current;
 
-    if (!isVideoEnabled || !section || !media || !clipUrl || getPrefersReducedMotion()) return undefined;
+    if (!isVideoEnabled || !section || !media || !clipUrl) return undefined;
 
     // The hero is the first screen, so assume it is visible. Waiting for the
     // observer let iOS cancel autoplay on a zero-height first layout pass.
     let isVisible = true;
-    let recoveryFrame = 0;
-
-    const cancelRecoveryFrame = () => {
-      if (!recoveryFrame) return;
-      cancelAnimationFrame(recoveryFrame);
-      recoveryFrame = 0;
-    };
 
     const pauseVideo = () => {
-      cancelRecoveryFrame();
       media.pause();
     };
 
     const playVideo = async () => {
       // An explicit keyboard pause wins over every auto-recovery path.
-      if (userPausedRef.current || !isVisible || document.hidden) return false;
+      if (userPausedRef.current || !isVisible) return false;
 
-      media.muted = true;
-      media.defaultMuted = true;
-      media.playsInline = true;
+      armHeroPlayback(media);
 
       try {
         const playback = media.play();
         if (playback && typeof playback.then === 'function') {
           await playback;
         }
-        setIsPlaybackBlocked(false);
         return true;
-      } catch (error) {
-        // A pause that lands mid-play rejects with AbortError. That is not a
-        // policy block, and treating it as one is what left the play button up.
-        if (error?.name !== 'NotAllowedError' || media.readyState < 2) return false;
-        setIsPlaybackBlocked(true);
+      } catch {
         return false;
       }
     };
 
     const queueRecovery = () => {
-      if (recoveryFrame || !isVisible || document.hidden || !media.paused) return;
-
-      recoveryFrame = requestAnimationFrame(() => {
-        recoveryFrame = 0;
-        void playVideo();
-      });
+      if (!isVisible || !media.paused) return;
+      void playVideo();
     };
 
     const handleVisibilityChange = () => {
-      if (document.hidden) {
-        pauseVideo();
-        return;
-      }
       queueRecovery();
     };
 
-    const handleAutoplayRecovery = (event) => {
-      if (event.target?.closest?.('.hero-video-unblock')) return;
+    const handleAutoplayRecovery = () => {
       if (!media.paused) return;
       void playVideo();
     };
@@ -181,9 +161,12 @@ export default function Hero() {
 
     const io = new IntersectionObserver(
       ([entry]) => {
-        if (!entry.isIntersecting && entry.boundingClientRect.height === 0) return;
+        if (entry.boundingClientRect.height === 0) return;
 
-        isVisible = entry.isIntersecting;
+        // Pause only after the hero has actually left the screen. iOS reports
+        // "not intersecting" during the address-bar resize and that used to
+        // freeze the clip on a still poster.
+        isVisible = entry.boundingClientRect.bottom > 0;
 
         if (isVisible) {
           queueRecovery();
@@ -192,11 +175,12 @@ export default function Hero() {
 
         pauseVideo();
       },
-      { threshold: 0.1 },
+      { threshold: [0, 0.01, 0.1] },
     );
 
     io.observe(section);
 
+    media.addEventListener('loadedmetadata', handleCanPlay);
     media.addEventListener('loadeddata', handleCanPlay);
     media.addEventListener('canplay', handleCanPlay);
     media.addEventListener('playing', handleCanPlay);
@@ -207,44 +191,30 @@ export default function Hero() {
     }
 
     queueRecovery();
+    const retryTimer = window.setInterval(queueRecovery, 700);
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('pageshow', handleAutoplayRecovery);
     window.addEventListener('pointerdown', handleAutoplayRecovery);
-    window.addEventListener('touchstart', handleAutoplayRecovery);
+    window.addEventListener('touchstart', handleAutoplayRecovery, { passive: true });
     window.addEventListener('keydown', handleAutoplayRecovery);
 
     return () => {
       io.disconnect();
+      window.clearInterval(retryTimer);
+      media.removeEventListener('loadedmetadata', handleCanPlay);
       media.removeEventListener('loadeddata', handleCanPlay);
       media.removeEventListener('canplay', handleCanPlay);
       media.removeEventListener('playing', handleCanPlay);
       media.removeEventListener('error', handleVideoError);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('pageshow', handleAutoplayRecovery);
       window.removeEventListener('pointerdown', handleAutoplayRecovery);
       window.removeEventListener('touchstart', handleAutoplayRecovery);
       window.removeEventListener('keydown', handleAutoplayRecovery);
       pauseVideo();
     };
   }, [clipUrl, isVideoEnabled]);
-
-  const handleManualPlayback = async () => {
-    const media = videoRef.current;
-    if (!media) return;
-
-    media.muted = true;
-    media.defaultMuted = true;
-    media.playsInline = true;
-    userPausedRef.current = false;
-    setIsUserPaused(false);
-
-    try {
-      await media.play();
-      setIsReady(true);
-      setIsPlaybackBlocked(false);
-    } catch {
-      setIsPlaybackBlocked(true);
-    }
-  };
 
   const toggleHeroPlayback = () => {
     const media = videoRef.current;
@@ -253,9 +223,7 @@ export default function Hero() {
     if (media.paused) {
       userPausedRef.current = false;
       setIsUserPaused(false);
-      media.muted = true;
-      media.defaultMuted = true;
-      media.playsInline = true;
+      armHeroPlayback(media);
       media.play()?.catch?.(() => {});
       return;
     }
@@ -272,7 +240,7 @@ export default function Hero() {
       data-hero-variant={heroVariant}
     >
       <div className="hero-shell">
-        {isVideoEnabled && !isPlaybackBlocked && (
+        {isVideoEnabled && (
           <button
             type="button"
             className="hero-video-toggle"
@@ -322,24 +290,20 @@ export default function Hero() {
                 ref={(node) => {
                   videoRef.current = node;
                   if (!node) return;
-                  // The attribute alone is not enough: several engines check the
-                  // property, and a truthy property is what lets autoplay through.
-                  node.muted = true;
-                  node.defaultMuted = true;
-                  node.playsInline = true;
-                  // Assign the file here. <source media> is ignored by iOS, so the
-                  // browser would otherwise keep the blurred widescreen film.
-                  const url = heroClipUrl();
+                  armHeroPlayback(node);
+                  const url = clipUrl || heroClipUrl();
                   if (url && node.src !== new URL(url, window.location.href).href) node.src = url;
+                  node.play()?.catch?.(() => {});
                 }}
                 className={`hero-video ${isReady ? 'is-ready' : ''}`}
                 autoPlay
                 muted
                 loop
                 playsInline
+                webkit-playsinline=""
                 disablePictureInPicture
                 disableRemotePlayback
-                preload={clipUrl ? 'auto' : 'none'}
+                preload="auto"
                 src={clipUrl || undefined}
                 onError={handleSourceError}
                 // No poster attr: the twin <img> behind it shows the same
@@ -351,17 +315,6 @@ export default function Hero() {
               />
             )}
           </div>
-
-          {isVideoEnabled && isPlaybackBlocked && (
-            <button
-              type="button"
-              className="hero-video-unblock inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold"
-              onClick={handleManualPlayback}
-            >
-              <Play size={14} fill="currentColor" strokeWidth={1.75} aria-hidden="true" />
-              Reproduzir vídeo
-            </button>
-          )}
         </div>
 
         <div className="hero-scrim" aria-hidden="true" />

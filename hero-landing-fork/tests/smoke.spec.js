@@ -323,6 +323,40 @@ test.describe('site institucional P&B', () => {
     expect(presentation.copyOverMedia).toBe(true);
   });
 
+  test('o vídeo da hero começa sozinho, mudo e inline, sem pedir um clique', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await openPage(page, '/');
+
+    const video = page.locator('.hero-video');
+    await expect(video).toHaveCount(1);
+    await expect(page.locator('.hero-video-unblock')).toHaveCount(0);
+
+    const playback = await video.evaluate((node) => ({
+      autoplay: node.autoplay,
+      muted: node.muted,
+      playsInline: node.playsInline,
+      loop: node.loop,
+      hasSrc: Boolean(node.currentSrc || node.src),
+    }));
+    expect(playback).toEqual({
+      autoplay: true,
+      muted: true,
+      playsInline: true,
+      loop: true,
+      hasSrc: true,
+    });
+  });
+
+  test('o vídeo da hero segue no automático mesmo com movimento reduzido', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openPage(page, '/');
+
+    await expect(page.locator('.hero-video')).toHaveCount(1);
+    await expect(page.locator('.hero-video-unblock')).toHaveCount(0);
+    await expect(page.locator('.hero-section').getByRole('button', { name: 'Reproduzir vídeo' })).toHaveCount(0);
+  });
+
   test('oferece três geometrias responsivas para a hero', async ({ page }) => {
     test.slow();
 
