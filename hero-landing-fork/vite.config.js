@@ -30,6 +30,21 @@ function absoluteUrl(siteUrl, pathname) {
   return new URL(pathname, siteUrl).href
 }
 
+// Hardcoded on purpose, not a Vercel env var — keeps the deploy target
+// swappable without extra platform config. The container ID isn't a
+// secret: it's public in every page's source once GTM loads.
+const GTM_ID = 'GTM-N2WHNXC'
+
+function buildGtmHeadSnippet(gtmId) {
+  if (!gtmId) return ''
+  return `<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${gtmId}');</script>`
+}
+
+function buildGtmBodySnippet(gtmId) {
+  if (!gtmId) return ''
+  return `<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=${gtmId}" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>`
+}
+
 function buildJsonLd(siteUrl) {
   const { company, contact, social, faq } = siteData
   const logoUrl = absoluteUrl(siteUrl, company.logoSrc)
@@ -168,7 +183,7 @@ function staticAssetVersioningPlugin() {
   }
 }
 
-function htmlMetadataPlugin(siteUrl) {
+function htmlMetadataPlugin(siteUrl, gtmId) {
   return {
     name: 'pb-html-metadata',
     transformIndexHtml(html) {
@@ -178,6 +193,8 @@ function htmlMetadataPlugin(siteUrl) {
         .replaceAll('__SITE_URL__', siteUrl)
         .replaceAll('__OG_IMAGE_URL__', ogImageUrl)
         .replace('__JSON_LD__', buildJsonLd(siteUrl))
+        .replace('__GTM_HEAD__', buildGtmHeadSnippet(gtmId))
+        .replace('__GTM_BODY__', buildGtmBodySnippet(gtmId))
     },
   }
 }
@@ -190,7 +207,7 @@ export default defineConfig(({ mode, isSsrBuild }) => {
     // The SSR bundle only needs the JS entry; without this it would copy the
     // whole public/ folder into dist/ssr a second time.
     publicDir: isSsrBuild ? false : 'public',
-    plugins: [htmlMetadataPlugin(siteUrl), staticAssetVersioningPlugin(), react(), tailwindcss()],
+    plugins: [htmlMetadataPlugin(siteUrl, GTM_ID), staticAssetVersioningPlugin(), react(), tailwindcss()],
     build: {
       target: 'es2020',
       cssCodeSplit: true,
