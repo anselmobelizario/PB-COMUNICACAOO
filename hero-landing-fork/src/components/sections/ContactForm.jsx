@@ -4,6 +4,7 @@ import { useReveal } from '../../hooks/useReveal';
 import WhatsAppIcon from '../ui/WhatsAppIcon';
 import { siteData } from '../../data/siteData';
 import { buildWhatsAppLink } from '../../utils/whatsapp';
+import { pushEvent } from '../../utils/analytics';
 
 const INITIAL_STATE = { name: '', company: '', contact: '', message: '', consent: false };
 
@@ -108,6 +109,8 @@ export default function ContactForm() {
       scheduleStatusReset();
       return;
     }
+
+    pushEvent('generate_lead', { method: channel });
 
     if (channel === 'email') {
       // A mailto navigation can't be confirmed (no client installed = nothing
